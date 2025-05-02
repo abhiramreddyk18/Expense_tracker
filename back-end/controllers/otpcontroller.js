@@ -57,27 +57,13 @@ exports.SendingOtp = async (req, res) => {
   try {
     let existingUser = await User.findOne({ email });
 
-    // If the user doesn't exist, create the user and also create an empty UserBank document
+    
     if (!existingUser) {
       existingUser = await User.create({ email });
-
-      // Create a new UserBank document with just the userId (and minimal fields)
-      const newUserBank = new UserBank({
-        userId: existingUser._id,  // Set the user's _id as userId
-        email: email,  // Store the email for reference
-        phonenumber: ""  // Optional placeholder for phone number
-        // Bank details will be added later
-      });
-
-      // Save the new UserBank document
-      await newUserBank.save();
-
-      // Link the UserBank reference to the User document
-      existingUser.bankdetails = newUserBank._id;
       await existingUser.save();
     }
 
-    // Generate OTP and save/update OTP in the database
+    
     const otp = generateOtp();
     await Otp.findOneAndUpdate(
       { email },
@@ -85,10 +71,10 @@ exports.SendingOtp = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Send OTP email to the user
+    
     await sendEmail(email, 'Your OTP Code', `Your OTP is: ${otp}`);
 
-    // Generate token for the user (e.g., JWT token)
+    
     const token = generateToken(email);
 
     res.status(200).json({ message: 'OTP sent successfully', token });

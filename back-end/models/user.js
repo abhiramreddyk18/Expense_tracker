@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const UserBank = require('./UserLinkedBank'); 
+
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -10,9 +10,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  bankdetails: {   // Link to UserBank schema
+  bankdetails: {  
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'UserBank',  // This refers to the UserBank model
+    ref: 'UserBank',  
     required: false
   },
   transactionPin: {

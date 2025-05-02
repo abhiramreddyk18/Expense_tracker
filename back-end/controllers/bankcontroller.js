@@ -1,7 +1,7 @@
 
 const User = require('../models/user');
 
-const BankDetails = require('../models/BankDetails');
+const UserBank = require('../models/UserLinkedBank');
 
 
 
@@ -12,7 +12,7 @@ exports.check_user = async (req, res) => {
     const user = await User.findOne({ email });
     
     if (user) { 
-      if (user.BankDetails.accountNumber) {
+      if (user.bankdetails.accountNumber) {
         return res.status(200).json({ exists: true, bankConnected: true });
       }
       return res.status(200).json({ exists: true, bankConnected: false });
@@ -30,7 +30,7 @@ exports.verify_bank_details = async (req, res) => {
 
   try {
   
-    const fakeBankDetails = await BankDetails.findOne({ email });
+    const fakeBankDetails = await bankDetails.findOne({ email });
 
     if (!fakeBankDetails) {
       return res.status(400).json({ success: false, message: 'Bank details not found' });
