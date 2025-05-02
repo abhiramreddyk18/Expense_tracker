@@ -1,10 +1,8 @@
 const express = require('express');
-const { createOrder, verifyPayment, recent_payments } = require('../controllers/paymentcontroller');
+const {recent_payments, send_money } = require('../controllers/paymentcontroller');
 
 const router = express.Router();
 
-router.post('/create-order', createOrder);
-router.post('/verify-payment', verifyPayment);
 router.get('/recent-payments/:userId',recent_payments);
-
+router.post('/send_money',send_money)
 module.exports = router;

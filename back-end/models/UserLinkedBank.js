@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
-const bankAccountSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Reference User model correctly
+const userbankSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User',  
+    required: true 
+  },  
   name: {
     type: String,
     required: true
@@ -37,6 +41,6 @@ const bankAccountSchema = new mongoose.Schema({
   }
 });
 
-const BankDetails = mongoose.model("BankDetails", bankAccountSchema); 
+const UserBank = mongoose.model("UserBank", userbankSchema); 
 
-module.exports = BankDetails;
+module.exports = UserBank;

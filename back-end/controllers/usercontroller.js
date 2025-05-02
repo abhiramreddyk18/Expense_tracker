@@ -1,23 +1,3 @@
-const { default: transporter } = require("../config/nodemailer");
-
-
-
-
-
-
-exports.logoutUser = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Lax",
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "User logged out successfully",
-  });
-};
-
 
 
 exports.search_user_by_phone = async (req, res) => {

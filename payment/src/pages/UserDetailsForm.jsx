@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-
-const UserDetailsForm = ({ onSubmit }) => {
+import { useNavigate } from "react-router-dom";
+const UserDetailsForm = () => {
   
   const [formData, setFormData] = useState({
     email: '',
@@ -9,6 +9,7 @@ const UserDetailsForm = ({ onSubmit }) => {
     bankName: '',
     ifscCode: ''
   });
+  const navigate = useNavigate();
   const backendUrl = 'http://localhost:3000';
 
   const handleChange = (e) => {
@@ -18,7 +19,7 @@ const UserDetailsForm = ({ onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const response = await fetch(`${backendUrl}/users/verify-bank-details`, {
+    const response = await fetch(`${backendUrl}/bank/verify_bank_details`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
@@ -26,8 +27,7 @@ const UserDetailsForm = ({ onSubmit }) => {
 
     const data = await response.json();
     if (data.success) {
-      alert('Bank details verified & stored successfully!');
-      onSubmit(); 
+      navigate('/home');
     } else {
       alert(data.message);
     }

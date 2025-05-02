@@ -1,9 +1,10 @@
 const Otp = require('../models/otp');
 const User = require('../models/user');
 const sendEmail = require('../utils/sendEmail');
-const generateToken = require('../utils/generateToken')
+       
+const UserBank = require('../models/UserLinkedBank'); 
+const generateToken = require('../utils/generateToken');
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
-
 
 exports.verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
@@ -13,7 +14,7 @@ exports.verifyOtp = async (req, res) => {
   }
 
   try {
-    
+   
     const otpRecord = await Otp.findOne({ email });
 
     if (!otpRecord || otpRecord.otp !== otp) {
@@ -27,11 +28,12 @@ exports.verifyOtp = async (req, res) => {
       return res.status(400).json({ message: 'OTP expired' });
     }
 
-  
+   
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
     const isNewUser = !user.isBankConnected;
 
     return res.status(200).json({
@@ -47,39 +49,46 @@ exports.verifyOtp = async (req, res) => {
 
 
 
-
-
-
 exports.SendingOtp = async (req, res) => {
-
-
   const { email } = req.body;
 
   if (!email) return res.status(400).json({ message: 'Email is required' });
 
   try {
-
     let existingUser = await User.findOne({ email });
 
-
+    // If the user doesn't exist, create the user and also create an empty UserBank document
     if (!existingUser) {
       existingUser = await User.create({ email });
+
+      // Create a new UserBank document with just the userId (and minimal fields)
+      const newUserBank = new UserBank({
+        userId: existingUser._id,  // Set the user's _id as userId
+        email: email,  // Store the email for reference
+        phonenumber: ""  // Optional placeholder for phone number
+        // Bank details will be added later
+      });
+
+      // Save the new UserBank document
+      await newUserBank.save();
+
+      // Link the UserBank reference to the User document
+      existingUser.bankdetails = newUserBank._id;
+      await existingUser.save();
     }
 
-
+    // Generate OTP and save/update OTP in the database
     const otp = generateOtp();
-
-
     await Otp.findOneAndUpdate(
       { email },
       { otp, createdAt: new Date() },
       { upsert: true, new: true }
     );
 
-
+    // Send OTP email to the user
     await sendEmail(email, 'Your OTP Code', `Your OTP is: ${otp}`);
 
-
+    // Generate token for the user (e.g., JWT token)
     const token = generateToken(email);
 
     res.status(200).json({ message: 'OTP sent successfully', token });
@@ -88,5 +97,4 @@ exports.SendingOtp = async (req, res) => {
     console.error('Send OTP error:', error);
     res.status(500).json({ message: 'Server error' });
   }
-}
-
+};

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const SetPin = ({ userId }) => {
+const SetPin = () => {
   const [pin, setPin] = useState('');
 
   const handleSubmit = async (e) => {

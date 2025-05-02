@@ -1,26 +1,26 @@
 const mongoose = require("mongoose");
-const bankSchema=require("./BankDetails")
+const UserBank = require('./UserLinkedBank'); 
 const userSchema = new mongoose.Schema({
-    email: {
-      type: String,
-      required: true,
-      unique: true
-    },
-    isBankConnected: {
-      type: Boolean,
-      default: false
-    },
-    bankDetails: {
-        type: bankSchema,
-        default: undefined  
-      },
-      transactionPin: {
-        type: String, 
-        required: false
-      }
-  });
-  
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  isBankConnected: {
+    type: Boolean,
+    default: false
+  },
+  bankdetails: {   // Link to UserBank schema
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserBank',  // This refers to the UserBank model
+    required: false
+  },
+  transactionPin: {
+    type: String, 
+    required: false
+  }
+});
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = User;  
+module.exports = User;

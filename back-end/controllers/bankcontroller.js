@@ -12,7 +12,7 @@ exports.check_user = async (req, res) => {
     const user = await User.findOne({ email });
     
     if (user) { 
-      if (user.bankDetails.accountNumber) {
+      if (user.BankDetails.accountNumber) {
         return res.status(200).json({ exists: true, bankConnected: true });
       }
       return res.status(200).json({ exists: true, bankConnected: false });
