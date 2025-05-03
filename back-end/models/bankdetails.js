@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const userbankSchema = new mongoose.Schema({
+const bankSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User',  
@@ -41,7 +41,6 @@ const userbankSchema = new mongoose.Schema({
   }
 });
 
-const UserBank = mongoose.models.UserBank || mongoose.model("UserBank", userbankSchema);
+const bankdetails= mongoose.model("bankdetails", bankSchema); 
 
-
-module.exports = UserBank;
+module.exports = bankdetails;

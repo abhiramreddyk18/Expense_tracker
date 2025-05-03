@@ -77,7 +77,7 @@ exports.SendingOtp = async (req, res) => {
     
     const token = generateToken(email);
 
-    res.status(200).json({ message: 'OTP sent successfully', token });
+    res.status(200).json({success:true, message: 'OTP sent successfully', token });
 
   } catch (error) {
     console.error('Send OTP error:', error);

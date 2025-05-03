@@ -30,7 +30,9 @@ function LoginForm() {
       });
 
       const data = await response.json();
+      console.log(data);
       if (data.success) {
+        console.log(data.message);
         setOtpSent(true);
       } else {
         setError('Failed to send OTP.');
@@ -47,7 +49,7 @@ function LoginForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phoneNumber, otp }),
+        body: JSON.stringify({ email, otp }),
       });
 
       const data = await response.json();
@@ -55,7 +57,7 @@ function LoginForm() {
 
         if(data.isNewUser)
           {
-            navigate('/bankform');
+            navigate('/bankfrom');
           }
         else 
         {
