@@ -22,7 +22,7 @@ exports.check_user = async (req, res) => {
 };
 
 exports.verify_bank_details = async (req, res) => {
-  const { email, phoneNumber, accountNumber, bankName, ifscCode } = req.body;
+  const { email, phoneNumber, accountNumber, bankName, ifscCode,CVV} = req.body;
 
   try {
    
@@ -31,13 +31,21 @@ exports.verify_bank_details = async (req, res) => {
     if (!fakeBank) {
       return res.status(400).json({ success: false, message: 'Bank details not found' });
     }
-
+    console.log(fakeBank);
+    console.log(email);
+    console.log(phoneNumber);
+    console.log(accountNumber);
+    console.log(CVV);
+    console.log(bankName);
+    console.log(ifscCode);
     
     const isValid =
-      fakeBank.accountNumber === accountNumber &&
-      fakeBank.bankName === bankName &&
-      fakeBank.ifsc === ifscCode &&
-      fakeBank.phonenumber === phoneNumber;
+  fakeBank.accountNumber.toString().trim() === accountNumber.toString().trim() &&
+  fakeBank.bankName.toLowerCase().trim() === bankName.toLowerCase().trim() &&
+  fakeBank.ifsc.toLowerCase().trim() === ifscCode.toLowerCase().trim() &&
+  fakeBank.cvv.toString().trim() === CVV.toString().trim() &&
+  fakeBank.phonenumber.toString().trim() === phoneNumber.toString().trim();
+
 
     if (!isValid) {
       return res.status(400).json({ success: false, message: 'Incorrect bank details' });

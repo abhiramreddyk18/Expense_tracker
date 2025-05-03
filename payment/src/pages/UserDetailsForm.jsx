@@ -7,7 +7,8 @@ const UserDetailsForm = () => {
     phoneNumber: '',
     accountNumber: '',
     bankName: '',
-    ifscCode: ''
+    ifscCode: '',
+    CVV:''
   });
   const navigate = useNavigate();
   const backendUrl = 'http://localhost:3000';
@@ -118,10 +119,10 @@ const UserDetailsForm = () => {
       }}
     >
       <option value="">Select Bank</option>
-      <option value="SBI">State Bank of India</option>
-      <option value="HDFC">HDFC Bank</option>
-      <option value="ICICI">ICICI Bank</option>
-      <option value="Axis">Axis Bank</option>
+      <option value="State Bank of India">State Bank of India</option>
+      <option value="HDFC Bank">HDFC Bank</option>
+      <option value="ICICI Bank">ICICI Bank</option>
+      <option value="Axis Bank">Axis Bank</option>
       <option value="PNB">Punjab National Bank</option>
       <option value="Kotak">Kotak Mahindra Bank</option>
       <option value="BOB">Bank of Baroda</option>
@@ -141,7 +142,24 @@ const UserDetailsForm = () => {
         border: '1px solid #ccc',
         outlineColor: '#007bff',
       }}
+      
     />
+
+<label style={{ fontWeight: '600', color: '#444' }}>CVV:</label>
+    <input
+      type="text"
+      name="CVV"
+      value={formData.CVV}
+      onChange={handleChange}
+      required
+      style={{
+        padding: '12px',
+        fontSize: '15px',
+        borderRadius: '8px',
+        border: '1px solid #ccc',
+        outlineColor: '#007bff',
+      }}/>
+    
   
     <button
       type="submit"
