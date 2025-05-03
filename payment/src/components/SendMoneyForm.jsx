@@ -14,6 +14,7 @@ const SendMoneyForm = ({ senderId, receiver }) => {
 
     navigate('/app/confirm-pin', {
       state: {
+        senderId,
         receiverId: receiver._id,
         receiverEmail: receiver.email,
         amount,
@@ -25,6 +26,7 @@ const SendMoneyForm = ({ senderId, receiver }) => {
 
   return (
     <div>
+       <button onClick={() => navigate(-1)}>← Back</button>
       <h3>Send Money to {receiver?.name || 'Recipient'}</h3>
       <input
         type="number"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const SearchUser = ({ loggedInUserId }) => {
+const SearchUser = ({ loggedInUserId, onUserSelect }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -12,7 +12,7 @@ const SearchUser = ({ loggedInUserId }) => {
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      if (query.length > 1) {
+      if (query && query.length > 1) {  // Safe check for query
         searchUsers();
       } else {
         setResults([]);
@@ -51,7 +51,7 @@ const SearchUser = ({ loggedInUserId }) => {
       />
 
       {/* Show recent payments if no search */}
-      {query.length <= 1 && payments.length > 0 && (
+      {query?.length <= 1 && payments?.length > 0 && (
         <div className="space-y-4 mt-6">
           <h3 className="text-xl font-semibold mb-2">Recent Payments</h3>
           {payments.map((payment) => (
@@ -80,7 +80,7 @@ const SearchUser = ({ loggedInUserId }) => {
       )}
 
       {/* When searching show filtered users */}
-      {results.length > 0 && (
+      {results?.length > 0 && (
         <div className="user-results">
           {results.map((user) => (
             <div
@@ -103,7 +103,7 @@ const SearchUser = ({ loggedInUserId }) => {
         </div>
       )}
      
-      {results.length === 0 && query.length > 1 && (
+      {results?.length === 0 && query?.length > 1 && (
         <p>No users found</p>
       )}
     </div>

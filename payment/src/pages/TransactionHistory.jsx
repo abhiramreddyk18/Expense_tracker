@@ -2,6 +2,55 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import TransactionItem from '../components/TransactionItem';
 
+const styles = {
+  container: {
+    padding: '24px',
+    maxWidth: '768px',
+    margin: '0 auto',
+    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+  },
+  heading: {
+    textAlign: 'center',
+    fontSize: '24px',
+    fontWeight: 'bold',
+    marginBottom: '8px'
+  },
+  balance: {
+    textAlign: 'center',
+    fontSize: '32px',
+    color: '#38a169',
+    fontWeight: '600',
+    marginBottom: '24px'
+  },
+  filterGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '16px',
+    marginBottom: '24px'
+  },
+  input: {
+    border: '1px solid #ccc',
+    padding: '8px',
+    borderRadius: '6px',
+    fontSize: '14px'
+  },
+  select: {
+    border: '1px solid #ccc',
+    padding: '8px',
+    borderRadius: '6px',
+    fontSize: '14px'
+  },
+  subheading: {
+    fontSize: '20px',
+    fontWeight: '600',
+    marginBottom: '12px'
+  },
+  message: {
+    fontSize: '14px',
+    color: '#4a5568'
+  }
+};
+
 const TransactionHistory = () => {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
@@ -43,16 +92,16 @@ const TransactionHistory = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-center text-2xl font-bold">💼 Bank Balance</h2>
-      <h1 className="text-center text-green-600 text-3xl font-semibold mb-6">₹ {balance}</h1>
+    <div style={styles.container}>
+      <h2 style={styles.heading}>💼 Bank Balance</h2>
+      <h1 style={styles.balance}>₹ {balance}</h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+      <div style={styles.filterGrid}>
         <input
           type="date"
           name="date"
           onChange={handleFilterChange}
-          className="border p-2 rounded"
+          style={styles.input}
           value={filters.date}
         />
         <input
@@ -60,7 +109,7 @@ const TransactionHistory = () => {
           name="year"
           placeholder="Year"
           onChange={handleFilterChange}
-          className="border p-2 rounded"
+          style={styles.input}
           value={filters.year}
         />
         <input
@@ -68,10 +117,15 @@ const TransactionHistory = () => {
           name="month"
           placeholder="Month (1-12)"
           onChange={handleFilterChange}
-          className="border p-2 rounded"
+          style={styles.input}
           value={filters.month}
         />
-        <select name="type" onChange={handleFilterChange} className="border p-2 rounded" value={filters.type}>
+        <select
+          name="type"
+          onChange={handleFilterChange}
+          style={styles.select}
+          value={filters.type}
+        >
           <option value="">All Types</option>
           <option value="income">Income</option>
           <option value="expense">Expense</option>
@@ -81,14 +135,14 @@ const TransactionHistory = () => {
           name="category"
           placeholder="Category"
           onChange={handleFilterChange}
-          className="border p-2 rounded"
+          style={styles.input}
           value={filters.category}
         />
       </div>
 
-      <h3 className="text-xl font-semibold mb-2">📜 Transaction History</h3>
+      <h3 style={styles.subheading}>📜 Transaction History</h3>
       {transactions.length === 0 ? (
-        <p>No transactions found for selected filters.</p>
+        <p style={styles.message}>No transactions found for selected filters.</p>
       ) : (
         transactions.map(txn => (
           <TransactionItem key={txn._id} txn={txn} />
