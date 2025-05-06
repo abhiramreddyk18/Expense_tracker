@@ -1,18 +1,32 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 const SetPin = () => {
   const [pin, setPin] = useState('');
+  const [confirmPin, setConfirmPin] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (pin.length !== 4) return alert("PIN must be 4 digits");
+
+    if (pin !== confirmPin) {
+      alert('PINs do not match. Please try again.');
+      return;
+    }
+
+    if (!/^\d{4}$/.test(pin)) {
+      alert('PIN must be a 4-digit number.');
+      return;
+    }
 
     try {
-      await axios.post('/api/user/set-pin', { userId, pin });
-      alert("PIN set successfully");
-    } catch (err) {
-      alert("Failed to set PIN");
+      const userId = localStorage.getItem('userId');
+
+      await axios.post(`${ backendUrl}/payment/set-pin`, { userId, pin })
+
+      alert('PIN set successfully');
+      
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to set PIN');
     }
   };
 
@@ -25,6 +39,14 @@ const SetPin = () => {
         value={pin}
         onChange={(e) => setPin(e.target.value)}
         placeholder="Enter 4-digit PIN"
+        required
+      />
+      <input
+        type="password"
+        maxLength="4"
+        value={confirmPin}
+        onChange={(e) => setConfirmPin(e.target.value)}
+        placeholder="Confirm 4-digit PIN"
         required
       />
       <button type="submit">Set PIN</button>

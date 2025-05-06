@@ -24,7 +24,7 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
 
   const searchUsers = async () => {
     try {
-      const response = await fetch(`${backendUrl}/user/searchuser/search_user_by_phone?phoneNumber=${query}`,{
+      const response = await fetch(`${backendUrl}/user/searchuser?phoneNumber=${query}`,{
         method: 'GET',
       });
       

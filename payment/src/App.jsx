@@ -22,8 +22,8 @@ function App() {
           <Route path="/send-money" element={<SendMoneyPage />}></Route>
           <Route path="/login" element={<LoginForm />}></Route>
           <Route path="/transactions" element={<TransactionHistory />}></Route>
-          <Route path="/pin" element={<ConfirmPin/>}></Route>
-          <Route path="/resetpin" element={<SetPin/>}></Route>
+          <Route path="/confirm-pin" element={<ConfirmPin/>}></Route>
+          <Route path="/setpin" element={<SetPin/>}></Route>
           <Route path="/bankfrom" element={<UserDetailsForm />}></Route>
           <Route path="/calender" element={<CalendarPage/>}></Route>
           <Route path="/home" element={<Home/>}></Route>

@@ -26,3 +26,21 @@ exports.search_user_by_phone = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+
+exports.search_user_by_id = async (req, res) => {
+
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId).populate('bankdetails'); // populate if you need bankdetails
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+    
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user', error: error.message });
+  }}

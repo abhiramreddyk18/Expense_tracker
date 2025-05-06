@@ -115,6 +115,8 @@ exports.recent_payments = async (req, res) => {
     res.status(500).json({ message: 'Error fetching recent payments' });
   }
 }
+
+
 exports.searchTransactions = async (req, res) => {
   try {
     const {
@@ -142,12 +144,13 @@ exports.searchTransactions = async (req, res) => {
       specificDate.setHours(0, 0, 0, 0);
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
-      query.date = { $gte: specificDate, $lt: endOfDay };
+      query.date = { $gte: specificDate, $lte: endOfDay };
     }
 
-    const transactions = await Transaction.find(query).sort({ date: -1 });
+    console.log("Query:", query);
 
-    // Calculate balance
+    const transactions = await Transaction.find(query); 
+
     let balance = 0;
     for (const txn of transactions) {
       if (txn.type === "income") balance += txn.amount;
@@ -161,3 +164,32 @@ exports.searchTransactions = async (req, res) => {
   }
 };
 
+
+
+exports.setPin = async (req, res) => {
+  const { userId, pin } = req.body;
+
+  if (!userId || !pin) {
+    return res.status(400).json({ message: 'User ID and PIN are required' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    
+    if (!/^\d{4}$/.test(pin)) {
+      return res.status(400).json({ message: 'PIN must be a 4-digit number' });
+    }
+
+    user.transactionPin = pin;
+    await user.save();
+
+    res.status(200).json({ message: 'PIN set successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+}

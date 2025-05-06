@@ -62,7 +62,12 @@ exports.SendingOtp = async (req, res) => {
 
     
     if (!existingUser) {
-      existingUser = await User.create({ email });
+      existingUser = await User.create({
+        email,
+        transactionPin: null,
+        bankdetails: null
+      });
+      
       await existingUser.save();
     }
 

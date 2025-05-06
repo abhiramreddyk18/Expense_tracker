@@ -12,7 +12,7 @@ const SendMoneyForm = ({ senderId, receiver }) => {
       return alert("Please enter all details");
     }
 
-    navigate('/app/confirm-pin', {
+    navigate('/confirm-pin', {
       state: {
         senderId,
         receiverId: receiver._id,
