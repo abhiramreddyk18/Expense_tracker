@@ -1,7 +1,5 @@
-
-const bcrypt = require("bcrypt");
-const Transaction=require('../models/transaction')
-const User = require('../models/user')
+const Transaction=require('../models/transaction');
+const User = require('../models/user');
 
 const BankDetails = require('../models/UserLinkedBank');
 
@@ -117,4 +115,49 @@ exports.recent_payments = async (req, res) => {
     res.status(500).json({ message: 'Error fetching recent payments' });
   }
 }
+exports.searchTransactions = async (req, res) => {
+  try {
+    const {
+      type,
+      category,
+      year,
+      month,
+      date,
+      userId
+    } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: "Missing userId" });
+    }
+
+    const query = { userId };
+
+    if (type) query.type = type;
+    if (category) query.category = category;
+    if (year) query.year = Number(year);
+    if (month) query.month = Number(month);
+
+    if (date) {
+      const specificDate = new Date(date);
+      specificDate.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.date = { $gte: specificDate, $lt: endOfDay };
+    }
+
+    const transactions = await Transaction.find(query).sort({ date: -1 });
+
+    // Calculate balance
+    let balance = 0;
+    for (const txn of transactions) {
+      if (txn.type === "income") balance += txn.amount;
+      else if (txn.type === "expense") balance -= txn.amount;
+    }
+
+    res.status(200).json({ transactions, balance });
+  } catch (error) {
+    console.error("Error searching transactions:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 

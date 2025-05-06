@@ -61,33 +61,44 @@ const TransactionHistory = () => {
     type: '',
     category: ''
   });
-
+  
   const userId = localStorage.getItem("userId");
+  const backendUrl = 'http://localhost:3000';
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(`/api/transaction/history`, {
+      console.log(userId);
+      const res = await axios.get(`${backendUrl}/payment/searchtransactions`, {
         params: {
           userId,
           ...filters,
         }
       });
-      setBalance(res.data.balance);
-      setTransactions(res.data.transactions);
+
+      console.log(res.data);
+      
+      if (res.data) {
+        setBalance(res.data.balance);
+        setTransactions(res.data.transactions);
+      }
     } catch (err) {
       console.error("Failed to fetch history:", err);
     }
   };
 
-  useEffect(() => {
-    if (userId) fetchHistory();
-  }, [filters]);
 
+  useEffect(() => {
+    if (userId) {
+      fetchHistory();
+    }
+  }, [filters, userId]);
+
+ 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -130,14 +141,23 @@ const TransactionHistory = () => {
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
-        <input
-          type="text"
+        <select
           name="category"
-          placeholder="Category"
           onChange={handleFilterChange}
           style={styles.input}
           value={filters.category}
-        />
+        >
+          <option value="">All Categories</option>
+          <option value="Food">Food</option>
+          <option value="Bills">Bills</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Travel">Travel</option>
+          <option value="Education">Education</option>
+          <option value="Health">Health</option>
+          <option value="Salary">Salary</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
 
       <h3 style={styles.subheading}>📜 Transaction History</h3>

@@ -18,7 +18,7 @@ function App() {
 
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home/>}></Route>
+          <Route path="/" element={<LoginForm/>}></Route>
           <Route path="/send-money" element={<SendMoneyPage />}></Route>
           <Route path="/login" element={<LoginForm />}></Route>
           <Route path="/transactions" element={<TransactionHistory />}></Route>

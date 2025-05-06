@@ -35,10 +35,13 @@ exports.verifyOtp = async (req, res) => {
     }
 
     const isNewUser = !user.isBankConnected;
-
+    const token = generateToken(email, user._id);
     return res.status(200).json({
       verified: true,
-      isNewUser
+      isNewUser,
+      token,
+      userId: user._id,
+      email: user.email,
     });
 
   } catch (error) {
@@ -75,9 +78,9 @@ exports.SendingOtp = async (req, res) => {
     await sendEmail(email, 'Your OTP Code', `Your OTP is: ${otp}`);
 
     
-    const token = generateToken(email);
+   
 
-    res.status(200).json({success:true, message: 'OTP sent successfully', token });
+    res.status(200).json({success:true, message: 'OTP sent successfully' });
 
   } catch (error) {
     console.error('Send OTP error:', error);

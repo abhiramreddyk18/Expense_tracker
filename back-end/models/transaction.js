@@ -32,6 +32,7 @@ const transactionSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    trim: true,
   },
   date: {
     type: Date,
@@ -41,7 +42,7 @@ const transactionSchema = new mongoose.Schema({
     type: Number,
   },
   month: {
-    type: Number, 
+    type: Number, // 1-based (1 = Jan, 12 = Dec)
   },
   day: {
     type: Number,
@@ -53,24 +54,27 @@ const transactionSchema = new mongoose.Schema({
   utr: {
     type: String,
     unique: true,
+    sparse: true,
+    trim: true,
   },
   transactionId: {
     type: String,
     unique: true,
+    sparse: true,
+    trim: true,
   },
 });
-
 
 transactionSchema.pre("save", function (next) {
   const date = new Date(this.date);
   this.year = date.getFullYear();
-  this.month = date.getMonth()+1;
+  this.month = date.getMonth() + 1; 
   this.day = date.getDate();
   next();
 });
 
-transactionSchema.index({ userId: 1, date: -1 }); 
-transactionSchema.index({ userId: 1, category: 1 });
-transactionSchema.index({ userId: 1, type: 1 });
-transactionSchema.index({ userId: 1, year: 1, month: 1 });
-module.exports = mongoose.model("Transaction", transactionSchema);
+
+
+const Transaction = mongoose.model("Transaction", transactionSchema);
+
+module.exports = Transaction;

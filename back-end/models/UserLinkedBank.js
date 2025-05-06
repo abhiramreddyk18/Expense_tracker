@@ -35,7 +35,7 @@ const userbankSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  phonenumber: {
+  phoneNumber: {
     type: String,
     required: true
   }

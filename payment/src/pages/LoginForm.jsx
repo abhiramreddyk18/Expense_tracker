@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 function LoginForm() {
 
@@ -10,6 +10,13 @@ function LoginForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
   const backendUrl = 'http://localhost:3000';
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/home');
+    }else  navigate('/login');
+  }, [navigate]);
 
   const handleEmailChange = (e) => {
     setemail(e.target.value);
@@ -25,15 +32,17 @@ function LoginForm() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
+        },  
         body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
       console.log(data);
+
       if (data.success) {
         console.log(data.message);
         setOtpSent(true);
+
       } else {
         setError('Failed to send OTP.');
       }
@@ -54,7 +63,9 @@ function LoginForm() {
 
       const data = await response.json();
       if (data.verified) {
-
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('userEmail', email);
         if(data.isNewUser)
           {
             navigate('/bankfrom');

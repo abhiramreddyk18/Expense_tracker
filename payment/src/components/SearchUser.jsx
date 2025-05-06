@@ -5,32 +5,43 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [payments, setPayments] = useState([]);
-
+  const backendUrl = 'http://localhost:3000';
   useEffect(() => {
     fetchUserPayments();
   }, []);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      if (query && query.length > 1) {  // Safe check for query
+      if (query && query.length > 1) {
         searchUsers();
       } else {
         setResults([]);
       }
-    }, 500); 
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
   }, [query]);
 
   const searchUsers = async () => {
     try {
-      const res = await axios.get(`/api/transaction/search-user?query=${query}`);
-      setResults(res.data.users); 
+      const response = await fetch(`${backendUrl}/user/searchuser/search_user_by_phone?phoneNumber=${query}`,{
+        method: 'GET',
+      });
+      
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+  
+      const data = await response.json();
+      setResults(data.users); 
+      console.log("Search results:", data.users);
+  
     } catch (err) {
+      console.error("Error fetching users:", err);
       setResults([]);
     }
   };
-
+  
   const fetchUserPayments = async () => {
     try {
       const res = await axios.get(`/api/transaction/user-payments/${loggedInUserId}`);
@@ -50,7 +61,6 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {/* Show recent payments if no search */}
       {query?.length <= 1 && payments?.length > 0 && (
         <div className="space-y-4 mt-6">
           <h3 className="text-xl font-semibold mb-2">Recent Payments</h3>
@@ -79,7 +89,6 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
         </div>
       )}
 
-      {/* When searching show filtered users */}
       {results?.length > 0 && (
         <div className="user-results">
           {results.map((user) => (
@@ -97,12 +106,12 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
             >
               <h4>{user.name}</h4>
               <p>{user.email}</p>
-              <p>{user.phoneNumber}</p>
+              <p>{user.phoneNumber}</p> {/* Ensure this field is correct */}
             </div>
           ))}
         </div>
       )}
-     
+
       {results?.length === 0 && query?.length > 1 && (
         <p>No users found</p>
       )}
