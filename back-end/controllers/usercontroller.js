@@ -1,5 +1,6 @@
+const mongoose = require('mongoose');
 const UserBank = require('../models/UserLinkedBank'); 
-
+const User=require('../models/user');
 exports.search_user_by_phone = async (req, res) => {
   const { phoneNumber } = req.query;
   console.log("Phone query:", phoneNumber); // Log the phone number to verify the input
@@ -31,16 +32,16 @@ exports.search_user_by_phone = async (req, res) => {
 exports.search_user_by_id = async (req, res) => {
 
   const userId = req.params.id;
-
+      console.log("idljdas: "+userId)
   try {
-    const user = await User.findById(userId).populate('bankdetails'); // populate if you need bankdetails
+    const user = await User.findById(new mongoose.Types.ObjectId(userId));
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     res.json(user);
-    
+
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user', error: error.message });
   }}

@@ -13,7 +13,7 @@ const SetPin = () => {
       return;
     }
 
-    if (!/^\d{4}$/.test(pin)) {
+    if (!/^\d{4}$/.test(pin)) { 
       alert('PIN must be a 4-digit number.');
       return;
     }

@@ -11,9 +11,11 @@ const ConfirmPin = () => {
   useEffect(() => {
     const checkPinSet = async () => {
       try {
-        const res = await axios.get(`${backendUrl}/user/${state.senderId}`);
         
-        
+
+        const res = await axios.get(`${backendUrl}/user/${state.receiverId}`);
+
+        console.log(res.data.transactionPin);
         if (!res.data.transactionPin) {
           alert("You need to set your PIN before making transactions.");
           navigate("/setpin");
