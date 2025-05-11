@@ -38,6 +38,10 @@ const userbankSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     required: true
+  },
+  pin: {
+    type: String, 
+    required: false
   }
 });
 

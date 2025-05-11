@@ -1,8 +1,8 @@
 const Transaction=require('../models/transaction');
 const User = require('../models/user');
-
+const bcrypt = require('bcrypt');
 const BankDetails = require('../models/UserLinkedBank');
-
+const mongoose = require("mongoose");
 const generateTransactionId = () => {
   return "TXN" + Date.now() + Math.floor(Math.random() * 1000);
 };
@@ -11,21 +11,34 @@ const generateUTRId = () => {
   return Math.floor(100000000000 + Math.random() * 900000000000).toString();
 };
 
-exports.send_money = async (req, res) => {
-  const { senderId, receiverEmail, amount, category, description } = req.body;
-
+exports.sending_money = async (req, res) => {
+  const { senderId, receiverId, amount, category, description,pin } = req.body;
+      console.log("inside sending money sender id "+senderId);
+      console.log("inside sending receving id"+ receiverId);
   try {
-   
-    const sender = await User.findById(senderId);
-    const receiver = await User.findOne({ email: receiverEmail });
-
+    if (!senderId || !receiverId || !amount || !pin) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    
+    const sender = await BankDetails.findById(senderId);
+    const receiver = await BankDetails.findById(receiverId);
+    console.log("Sender:", sender);
+    console.log("Receiver:", receiver);
+     
     if (!sender || !receiver) {
       return res.status(404).json({ message: "Sender or Receiver not found" });
     }
+    let p=pin.toString()
 
-    const isValidPin = await bcrypt.compare(pin, sender.transactionPin);
-  if (!isValidPin) return res.status(401).json({ message: "Invalid transaction PIN" });
 
+
+    console.log("pin" , p , sender.pin);
+   const isPinCorrect = await bcrypt.compare(p, sender?.pin );
+
+
+    if (!isPinCorrect) {
+      return res.status(401).json({ message: "Incorrect PIN" });
+    }
     if (sender.bankdetails.balance < amount) {
       return res.status(400).json({ message: "Insufficient balance" });
     }
@@ -40,29 +53,41 @@ exports.send_money = async (req, res) => {
     const utrId = generateUTRId();
 
    
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    
     const senderTransaction = await Transaction.create({
-      userId: sender._id,
+      userId: senderId,
       type: "expense",
       amount,
       category,
       description,
-      relatedUser: receiver._id,
+      relatedUser: receiverId,
       transactionId: generateTransactionId(),
-      utrId
+      utr:utrId, 
+      date: now,
+      year,
+      month,
+      day
     });
-
-  
+    
     const receiverTransaction = await Transaction.create({
-      userId: receiver._id,
+      userId: receiverId,
       type: "income",
       amount,
       category,
       description,
-      relatedUser: sender._id,
+      relatedUser: senderId,
       transactionId: generateTransactionId(),
-      utrId
+      utr:utrId,
+      date: now,
+      year,
+      month,
+      day
     });
-
+    
     res.status(200).json({
       message: "Transaction successful",
       senderTransactionId: senderTransaction.transactionId,
@@ -79,14 +104,14 @@ exports.send_money = async (req, res) => {
 
 
 exports.setTransactionPin = async (req, res) => {
-  const { userId, pin } = req.body;
+  const { userId, userpin } = req.body;
 
-  if (!pin || pin.length !== 4) {
+  if (!userpin || userpin.length !== 4) {
     return res.status(400).json({ message: "PIN must be 4 digits" });
   }
 
-  const hashedPin = await bcrypt.hash(pin, 10);
-  await User.findByIdAndUpdate(userId, { transactionPin: hashedPin });
+  const hashedPin = await bcrypt.hash(userpin, 10);
+  await BankDetails.findByIdAndUpdate(userId, { pin: hashedPin });
 
   res.status(200).json({ message: "Transaction PIN set successfully" });
 };
@@ -127,12 +152,12 @@ exports.searchTransactions = async (req, res) => {
       date,
       userId
     } = req.query;
-
+    console.log("inside transactions  "+userId);
     if (!userId) {
       return res.status(400).json({ message: "Missing userId" });
     }
 
-    const query = { userId };
+    const query = { userId: new mongoose.Types.ObjectId(userId)};
 
     if (type) query.type = type;
     if (category) query.category = category;
@@ -168,6 +193,8 @@ exports.searchTransactions = async (req, res) => {
 
 exports.setPin = async (req, res) => {
   const { userId, pin } = req.body;
+
+  console.log("setpin "+ userId);
 
   if (!userId || !pin) {
     return res.status(400).json({ message: 'User ID and PIN are required' });

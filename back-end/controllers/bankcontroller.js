@@ -67,7 +67,8 @@ exports.verify_bank_details = async (req, res) => {
       cvv: fakeBank.cvv,
       balance: fakeBank.balance,
       email: fakeBank.email,
-      phonenumber: fakeBank.phonenumber
+      phoneNumber: fakeBank.phonenumber,
+      pin:null
     });
 
     await newUserBank.save();

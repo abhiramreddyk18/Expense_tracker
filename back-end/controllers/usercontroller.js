@@ -34,13 +34,17 @@ exports.search_user_by_id = async (req, res) => {
   const userId = req.params.id;
       console.log("idljdas: "+userId)
   try {
-    const user = await User.findById(new mongoose.Types.ObjectId(userId));
+
+    const user = await  User.findById(userId);
+
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(user);
+    const userbank=await UserBank.findById(user.bankdetails);
+    console.log(userbank);
+    res.json(userbank);
 
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user', error: error.message });

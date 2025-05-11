@@ -12,6 +12,8 @@ const SendMoneyForm = ({ senderId, receiver }) => {
       return alert("Please enter all details");
     }
 
+    console.log("receiver ---> " + JSON.stringify(receiver));
+
     navigate('/confirm-pin', {
       state: {
         senderId,

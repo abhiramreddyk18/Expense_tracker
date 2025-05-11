@@ -14,12 +14,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'UserBank',  
     required: false
-  },
-  transactionPin: {
-    type: String, 
-    required: false
-  }
-});
+  }});
 
 const User = mongoose.model("User", userSchema);
 
