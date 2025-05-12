@@ -8,6 +8,9 @@ import ConfirmPin from './components/ConfirmPin';
 import SetPin from './components/Setpin';
 import UserDetailsForm from './pages/UserDetailsForm';
 import CalendarPage from './pages/CalendarPage';
+import SearchUser from './components/SearchUser';
+import ProfilePage from './pages/ProfilePage';
+import Insigths from './pages/Insigths';
 
 
 function App() {
@@ -27,9 +30,16 @@ function App() {
           <Route path="/bankfrom" element={<UserDetailsForm />}></Route>
           <Route path="/calender" element={<CalendarPage/>}></Route>
           <Route path="/home" element={<Home/>}></Route>
+           <Route path="/searchuser" element={<SearchUser/>}></Route>
+            <Route path="/insights" element={<Insigths/>}></Route>
+              <Route path="/profile" element={<ProfilePage/>}></Route>
+            
+            
+
         </Routes>
       </BrowserRouter>
 
+      
       
     </div>
 

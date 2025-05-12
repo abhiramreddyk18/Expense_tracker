@@ -12,17 +12,23 @@ const ConfirmPin = () => {
 
   useEffect(() => {
     console.log("Navigation state received:", state);
-  }, []);
+  },);
 
   
   useEffect(() => {
     const checkPinSet = async () => {
       try {
         console.log("confirm pin page: " + state.senderId);
+
         const res = await axios.get(`${backendUrl}/user/${state?.senderId}`);
+
         console.log("inside conform sender data:" +  res.data);
-          setsenderbankid(res.data._id);
-          console.log("inside confirmpin:"+  senderbankid);
+
+        setsenderbankid(res.data);
+
+        console.log("inside confirmpin:"+  senderbankid);
+
+
         if (!res.data.pin) {
           alert("You need to set your PIN before making transactions.");
           navigate("/setpin", {
@@ -33,8 +39,10 @@ const ConfirmPin = () => {
         } else {
           setLoading(false);
         }
+        
       } catch (err) {
-        alert("Unable to verify PIN setup. Please try again.");
+
+        alert("Unable to verify PIN setup. Please try again.",err);
         navigate("/send-money");
       }
     };
@@ -50,7 +58,7 @@ const ConfirmPin = () => {
   const handleConfirm = async () => {
     try {
 
-      const res = await axios.post(`${backendUrl}/payment/send_money`, {
+       await axios.post(`${backendUrl}/payment/send_money`, {
         senderId: senderbankid,
         receiverId: state?.receiverId,
         amount:  Number(state?.amount),
@@ -60,7 +68,7 @@ const ConfirmPin = () => {
       });
 
       alert("Money sent successfully");
-      navigate("/dashboard");
+      navigate("/searchuser");
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Transaction failed");

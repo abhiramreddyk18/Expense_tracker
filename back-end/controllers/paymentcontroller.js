@@ -1,30 +1,38 @@
 const Transaction=require('../models/transaction');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
-const BankDetails = require('../models/UserLinkedBank');
+const UserBank = require('../models/UserLinkedBank');
 const mongoose = require("mongoose");
 const generateTransactionId = () => {
   return "TXN" + Date.now() + Math.floor(Math.random() * 1000);
 };
 
-const generateUTRId = () => {
-  return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+const generateUniqueUTR = async () => {
+  let unique = false;
+  let utr;
+
+  while (!unique) {
+    utr = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+    const existing = await Transaction.findOne({ utr });
+    if (!existing) {
+      unique = true;
+    }
+  }
+
+  return utr;
 };
 
 exports.sending_money = async (req, res) => {
   const { senderId, receiverId, amount, category, description,pin } = req.body;
-      console.log("inside sending money sender id "+senderId);
-      console.log("inside sending receving id"+ receiverId);
+     
   try {
     if (!senderId || !receiverId || !amount || !pin) {
       return res.status(400).json({ message: "Missing required fields" });
     }
     
-    const sender = await BankDetails.findById(senderId);
-    const receiver = await BankDetails.findById(receiverId);
-    console.log("Sender:", sender);
-    console.log("Receiver:", receiver);
-     
+    const sender = await UserBank.findById(senderId);
+    const receiver = await UserBank.findById(receiverId);
+ 
     if (!sender || !receiver) {
       return res.status(404).json({ message: "Sender or Receiver not found" });
     }
@@ -33,24 +41,25 @@ exports.sending_money = async (req, res) => {
 
 
     console.log("pin" , p , sender.pin);
-   const isPinCorrect = await bcrypt.compare(p, sender?.pin );
+   const isPinCorrect = (p==sender.pin);
 
 
     if (!isPinCorrect) {
       return res.status(401).json({ message: "Incorrect PIN" });
     }
-    if (sender.bankdetails.balance < amount) {
+    if (sender.balance < amount) {
       return res.status(400).json({ message: "Insufficient balance" });
     }
 
     
-    sender.bankdetails.balance -= amount;
-    receiver.bankdetails.balance += amount;
+    sender.balance -= amount;
+    receiver.balance += amount;
 
     await sender.save();
     await receiver.save();
 
-    const utrId = generateUTRId();
+    const utrId1 =await generateUniqueUTR();
+    const utrId2 =await generateUniqueUTR();
 
    
     const now = new Date();
@@ -66,7 +75,7 @@ exports.sending_money = async (req, res) => {
       description,
       relatedUser: receiverId,
       transactionId: generateTransactionId(),
-      utr:utrId, 
+      utr:utrId1, 
       date: now,
       year,
       month,
@@ -81,7 +90,7 @@ exports.sending_money = async (req, res) => {
       description,
       relatedUser: senderId,
       transactionId: generateTransactionId(),
-      utr:utrId,
+      utr:utrId2,
       date: now,
       year,
       month,
@@ -92,7 +101,8 @@ exports.sending_money = async (req, res) => {
       message: "Transaction successful",
       senderTransactionId: senderTransaction.transactionId,
       receiverTransactionId: receiverTransaction.transactionId,
-      utrId
+      utrId1,
+      utrId2
     });
 
   } catch (err) {
@@ -152,13 +162,22 @@ exports.searchTransactions = async (req, res) => {
       date,
       userId
     } = req.query;
-    console.log("inside transactions  "+userId);
+
     if (!userId) {
       return res.status(400).json({ message: "Missing userId" });
     }
 
-    const query = { userId: new mongoose.Types.ObjectId(userId)};
+   
+    const bankUser = await UserBank.findOne({ userId: new mongoose.Types.ObjectId(userId) });
 
+    if (!bankUser) {
+      return res.status(404).json({ message: "Bank account not found for user" });
+    }
+
+    
+    const query = { userId: new mongoose.Types.ObjectId(bankUser._id) };
+
+    
     if (type) query.type = type;
     if (category) query.category = category;
     if (year) query.year = Number(year);
@@ -172,9 +191,8 @@ exports.searchTransactions = async (req, res) => {
       query.date = { $gte: specificDate, $lte: endOfDay };
     }
 
-    console.log("Query:", query);
-
-    const transactions = await Transaction.find(query); 
+    
+    const transactions = await Transaction.find(query);
 
     let balance = 0;
     for (const txn of transactions) {
@@ -182,10 +200,10 @@ exports.searchTransactions = async (req, res) => {
       else if (txn.type === "expense") balance -= txn.amount;
     }
 
-    res.status(200).json({ transactions, balance });
+    return res.status(200).json({ transactions, balance });
   } catch (error) {
     console.error("Error searching transactions:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -212,8 +230,10 @@ exports.setPin = async (req, res) => {
       return res.status(400).json({ message: 'PIN must be a 4-digit number' });
     }
 
-    user.transactionPin = pin;
-    await user.save();
+    const userbank=await UserBank.findById(user.bankdetails);
+
+    userbank.pin=pin;
+    await userbank.save();
 
     res.status(200).json({ message: 'PIN set successfully' });
   } catch (error) {

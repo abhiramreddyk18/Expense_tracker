@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const userName = "Rahul", balance = 12500.0;
+import axios from 'axios';
 
 const styles = {
   container: {
@@ -100,6 +99,27 @@ const styles = {
 };
 
 const Home = () => {
+  const [userName, setUserName] = useState('');
+  const [balance, setBalance] = useState(0);
+  const backendUrl = 'http://localhost:3000';
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    const fetchUserDetails = async () => {
+      try {
+        const res = await axios.get(`${backendUrl}/user/${userId}`);
+        const user = res.data;
+        setUserName(user.name);
+        setBalance(user.balance);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>

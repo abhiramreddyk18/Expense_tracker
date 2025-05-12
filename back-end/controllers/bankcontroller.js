@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const BankDetails = require('../models/bankdetails'); 
-const UserBank = require('../models/UserLinkedBank');    
+const UserBank = require('../models/UserLinkedBank');  
+const Transaction=require('../models/transaction');
+const mongoose=require('mongoose');  
 
 exports.check_user = async (req, res) => {
   const { email } = req.body;
@@ -87,5 +89,62 @@ exports.verify_bank_details = async (req, res) => {
   } catch (error) {
     console.error("Bank verification error:", error);
     return res.status(500).json({ error: 'Failed to verify bank details' });
+  }
+};
+
+
+
+exports.getSummaryForLastNDays = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const n = parseInt(req.query.days, 10);
+
+    if (!mongoose.Types.ObjectId.isValid(userId) || isNaN(n) || n < 0) {
+      return res.status(400).json({ message: "Invalid userId or days" });
+    }
+
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - n);
+
+
+    const user = await  User.findById(userId);
+
+     const userbank=await UserBank.findById(user.bankdetails);
+    
+
+    const result = await Transaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userbank._id),
+          date: { $gte: fromDate },
+        },
+      },
+      {
+        $group: {
+          _id: "$type",
+          total: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    let income = 0;
+    let expense = 0;
+
+    result.forEach((item) => {
+      if (item._id === "income") income = item.total;
+      if (item._id === "expense") expense = item.total;
+    });
+
+    const savings = income - expense;
+
+    console.log("Income:", income);
+    console.log("Expense:", expense);
+    console.log("Savings:", savings);
+
+    res.status(200).json({ income:income, expense: expense, savings: savings });
+
+  } catch (error) {
+    console.error("Error fetching summary:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
