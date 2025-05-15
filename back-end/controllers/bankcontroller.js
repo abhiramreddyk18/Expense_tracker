@@ -33,13 +33,6 @@ exports.verify_bank_details = async (req, res) => {
     if (!fakeBank) {
       return res.status(400).json({ success: false, message: 'Bank details not found' });
     }
-    console.log(fakeBank);
-    console.log(email);
-    console.log(phoneNumber);
-    console.log(accountNumber);
-    console.log(CVV);
-    console.log(bankName);
-    console.log(ifscCode);
     
     const isValid =
   fakeBank.accountNumber.toString().trim() === accountNumber.toString().trim() &&
@@ -137,14 +130,58 @@ exports.getSummaryForLastNDays = async (req, res) => {
 
     const savings = income - expense;
 
-    console.log("Income:", income);
-    console.log("Expense:", expense);
-    console.log("Savings:", savings);
+    
 
     res.status(200).json({ income:income, expense: expense, savings: savings });
 
   } catch (error) {
     console.error("Error fetching summary:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+exports.getcategorySum = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const n = parseInt(req.query.days, 10);
+
+    const endDate = new Date(); // Today
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - n); // Subtract 'n' days
+
+    const user = await User.findById(userId);
+    const userbank = await UserBank.findById(user.bankdetails);
+
+    const summary = await Transaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userbank._id),
+          date: { $gte: startDate, $lte: endDate } // Filter for transactions in the last 'n' days
+        },
+      },
+      {
+        $group: {
+          _id: { category: "$category", type: "$type" },  // Group by category and type
+          totalAmount: { $sum: "$amount" }
+        },
+      },
+      {
+        $sort: { "_id.category": 1, "_id.type": 1 } // Sort by category and then type
+      }
+    ]);
+
+    // Format the data to send it to the frontend
+    const formattedSummary = summary.map(item => ({
+      category: item._id.category,
+      type: item._id.type,
+      totalAmount: item.totalAmount
+    }));
+
+    res.json(formattedSummary);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch category summary." });
   }
 };

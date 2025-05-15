@@ -3,6 +3,7 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const UserBank = require('../models/UserLinkedBank');
 const mongoose = require("mongoose");
+const { verify } = require('crypto');
 const generateTransactionId = () => {
   return "TXN" + Date.now() + Math.floor(Math.random() * 1000);
 };
@@ -40,7 +41,7 @@ exports.sending_money = async (req, res) => {
 
 
 
-    console.log("pin" , p , sender.pin);
+   
    const isPinCorrect = (p==sender.pin);
 
 
@@ -129,27 +130,27 @@ exports.setTransactionPin = async (req, res) => {
 
 
 
-exports.recent_payments = async (req, res) => {
+// exports.recent_payments = async (req, res) => {
 
-  const { userId } = req.params;
+//   const { userId } = req.params;
 
-  try {
+//   try {
     
-    const recentPayments = await Transaction.find({
-      $or: [{ userId: userId }, { relatedUser: userId }] 
-    })
-      .populate('userId', 'name') 
-      .populate('relatedUser', 'name') 
-      .sort({ date: -1 }) 
-      .select('userId relatedUser type amount date'); 
+//     const recentPayments = await Transaction.find({
+//       $or: [{ userId: userId }, { relatedUser: userId }] 
+//     })
+//       .populate('userId', 'name') 
+//       .populate('relatedUser', 'name') 
+//       .sort({ date: -1 }) 
+//       .select('userId relatedUser type amount date'); 
 
 
-    res.json({ payments: recentPayments });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching recent payments' });
-  }
-}
+//     res.json({ payments: recentPayments });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Error fetching recent payments' });
+//   }
+// }
 
 
 exports.searchTransactions = async (req, res) => {
@@ -212,7 +213,6 @@ exports.searchTransactions = async (req, res) => {
 exports.setPin = async (req, res) => {
   const { userId, pin } = req.body;
 
-  console.log("setpin "+ userId);
 
   if (!userId || !pin) {
     return res.status(400).json({ message: 'User ID and PIN are required' });
@@ -240,3 +240,64 @@ exports.setPin = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 }
+
+
+
+exports.recent_payments=async (req, res) => {
+
+  const { userId } = req.params;
+  
+
+
+  try {
+   
+    const user = await User.findById(userId);
+
+    if (!user || !user.bankdetails) {
+      return res.status(404).json({ error: 'User or bank details not found' });
+    }
+
+    const userBankId = user.bankdetails;
+
+    
+    const transactions = await Transaction.find({
+      $or: [
+        { userId: userBankId },
+      ]
+    })
+      .sort({ date: -1 })
+      .limit(10);
+
+    const payments = await Promise.all(
+      transactions.map(async (tx) => {
+        const isSender = String(tx.userId) === String(userBankId);
+        const otherBankId = isSender ? tx.relatedUser : tx.userId;
+
+        let otherUser = null;
+        let otherUserBank = null;
+
+        if (otherBankId) {
+          otherUser = await User.findOne({ bankdetails: otherBankId });
+          otherUserBank = await UserBank.findById(otherBankId);
+        }
+
+        return {
+          _id: tx._id,
+          amount: tx.amount,
+          category: tx.category,
+          type: isSender ? 'sent' : 'received',
+          otherUserName: otherUserBank?.name || 'Unknown',
+          otherUserPhone: otherUserBank?.phoneNumber || 'N/A',
+          date: tx.date
+        };
+      })
+    );
+
+    return res.status(200).json({ payments });
+
+  } catch (err) {
+    console.error('Error fetching transactions:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+

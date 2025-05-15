@@ -61,6 +61,7 @@ const UserDetailsForm = () => {
       name="email"
       value={formData.email}
       onChange={handleChange}
+       
       required
       style={{
         padding: '12px',

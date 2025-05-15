@@ -5,7 +5,7 @@ const User=require('../models/user');
 
 exports.search_user_by_phone = async (req, res) => {
   const { phoneNumber } = req.query;
-  console.log("Phone query:", phoneNumber);
+
 
   if (!phoneNumber) {
     return res.status(400).json({ message: "Phone number is required" });
@@ -17,7 +17,7 @@ exports.search_user_by_phone = async (req, res) => {
       phoneNumber: { $regex: `^${phoneNumber}`, $options: 'i' }
     });
   
-    console.log(users);
+ 
 
     if (users.length === 0) {
       return res.status(404).json({ message: "No users found" });
@@ -40,7 +40,6 @@ exports.search_user_by_id = async (req, res) => {
 
     const user = await  User.findById(userId);
 
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -48,7 +47,6 @@ exports.search_user_by_id = async (req, res) => {
 
     const userbank=await UserBank.findById(user.bankdetails);
 
-    console.log(userbank);
     
     res.json(userbank);
 

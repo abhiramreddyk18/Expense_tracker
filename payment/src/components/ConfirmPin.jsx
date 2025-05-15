@@ -85,6 +85,7 @@ const ConfirmPin = () => {
         value={pin}
         maxLength="4"
         placeholder="Enter your PIN"
+       autoComplete="new-password"
         onChange={(e) => setPin(e.target.value)}
       />
       <button onClick={handleConfirm}>Confirm & Send</button>

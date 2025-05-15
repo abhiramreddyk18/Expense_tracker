@@ -41,6 +41,7 @@ const SetPin = () => {
         type="password"
         maxLength="4"
         value={pin}
+        autoComplete="new-password"
         onChange={(e) => setPin(e.target.value)}
         placeholder="Enter 4-digit PIN"
         required
@@ -49,6 +50,7 @@ const SetPin = () => {
         type="password"
         maxLength="4"
         value={confirmPin}
+        autoComplete="new-password"
         onChange={(e) => setConfirmPin(e.target.value)}
         placeholder="Confirm 4-digit PIN"
         required

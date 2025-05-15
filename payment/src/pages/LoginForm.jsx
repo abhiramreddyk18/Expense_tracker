@@ -10,13 +10,13 @@ function LoginForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
   const backendUrl = 'http://localhost:3000';
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/home');
-    }else  navigate('/login');
-  }, [navigate]);
+ const [loading, setLoading] = useState(false);
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    navigate('/home');
+  }
+}, [navigate]);
 
   const handleEmailChange = (e) => {
     setemail(e.target.value);
@@ -27,6 +27,8 @@ function LoginForm() {
   };
 
   const sendOtp = async () => {
+     setLoading(true); // ✅ show loading
+    setError('');
     try {
       const response = await fetch(`${backendUrl}/auth/sendotp`, {
         method: 'POST',
@@ -47,11 +49,14 @@ function LoginForm() {
         setError('Failed to send OTP.');
       }
     } catch (error) {
-      setError('Error sending OTP.');
+      setError('Error sending OTP.',error);
     }
+    setLoading(false);
   };
 
   const verifyOtp = async () => {
+     setLoading(true); // ✅ show loading
+    setError('');
     try {
       const response = await fetch(`${backendUrl}/auth/verify-otp`, {
         method: 'POST',
@@ -79,8 +84,9 @@ function LoginForm() {
         setError('Invalid OTP.');
       }
     } catch (error) {
-      setError('Error verifying OTP.');
+      setError('Error verifying OTP.',error);
     }
+    setLoading(false);
   };
 
   return (
@@ -100,7 +106,9 @@ function LoginForm() {
     Login
   </h1>
 
-  {!otpSent ? (
+  {loading ? (
+        <p style={{ textAlign: 'center', color: '#555' }}>Processing...</p> // ✅ loading message
+      ) :!otpSent ? (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <input
         type="email"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const SearchUser = ({ loggedInUserId, onUserSelect }) => {
+const SearchUser = ({  onUserSelect }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -44,7 +44,9 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
   
   const fetchUserPayments = async () => {
     try {
-      const res = await axios.get(`/api/transaction/user-payments/${loggedInUserId}`);
+      const userId = localStorage.getItem('userId');
+     
+      const res = await axios.get(`${backendUrl}/payment/user-payments/${userId}`);
       setPayments(res.data.payments);
     } catch (err) {
       console.error(err);
@@ -69,11 +71,6 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
               key={payment._id}
               className="flex items-center bg-white p-4 rounded-lg shadow"
             >
-              <img
-                src={payment.otherUserPhoto || '/default-user.png'}
-                alt="User"
-                className="w-12 h-12 rounded-full mr-4"
-              />
               <div className="flex-1">
                 <h4 className="font-semibold">{payment.otherUserName}</h4>
                 <p className="text-gray-500">{payment.otherUserPhone}</p>
@@ -106,7 +103,7 @@ const SearchUser = ({ loggedInUserId, onUserSelect }) => {
             >
               <h4>{user.name}</h4>
               <p>{user.email}</p>
-              <p>{user.phoneNumber}</p> {/* Ensure this field is correct */}
+              <p>{user.phoneNumber}</p> 
             </div>
           ))}
         </div>

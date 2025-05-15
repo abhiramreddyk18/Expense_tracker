@@ -11,6 +11,11 @@ import CalendarPage from './pages/CalendarPage';
 import SearchUser from './components/SearchUser';
 import ProfilePage from './pages/ProfilePage';
 import Insigths from './pages/Insigths';
+import Header from './components/Header';
+import ResetPin from './components/Resetpin';
+import PrivateRoute from './PrivateRoute';
+import { Navigate } from 'react-router-dom';
+
 
 
 function App() {
@@ -18,8 +23,9 @@ function App() {
 
   return (
     <div className="App">
-
+     
       <BrowserRouter>
+       <Header/>
         <Routes>
           <Route path="/" element={<LoginForm/>}></Route>
           <Route path="/send-money" element={<SendMoneyPage />}></Route>
@@ -29,18 +35,16 @@ function App() {
           <Route path="/setpin" element={<SetPin/>}></Route>
           <Route path="/bankfrom" element={<UserDetailsForm />}></Route>
           <Route path="/calender" element={<CalendarPage/>}></Route>
-          <Route path="/home" element={<Home/>}></Route>
-           <Route path="/searchuser" element={<SearchUser/>}></Route>
-            <Route path="/insights" element={<Insigths/>}></Route>
-              <Route path="/profile" element={<ProfilePage/>}></Route>
-            
-            
+          
+          <Route path="/searchuser" element={<SearchUser/>}></Route>
+          <Route path="/insights" element={<Insigths/>}></Route>
+          <Route path="/profile" element={<ProfilePage/>}></Route>
+             <Route path="/resetpin" element={<ResetPin/>}></Route>
+           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>}/>
 
+        <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </BrowserRouter>
-
-      
-      
     </div>
 
 

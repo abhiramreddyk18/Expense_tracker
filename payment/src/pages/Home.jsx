@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Player } from '@lottiefiles/react-lottie-player';
+;
 
 const styles = {
   container: {
@@ -70,38 +72,39 @@ const styles = {
     fontSize: '14px',
     boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
   },
-  navCards: {
+  animationSection: {
     marginTop: '40px',
-    display: 'grid',
-    gridTemplateColumns: '1fr',
-    gap: '24px'
+    display: 'flex',
+    justifyContent: 'center'
   },
-  card: {
-    padding: '24px',
+  aboutSection: {
+    marginTop: '40px',
+    background: '#fff',
     borderRadius: '20px',
-    color: 'white',
+    padding: '24px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
     textAlign: 'center',
-    fontSize: '18px',
-    fontWeight: '600',
-    textDecoration: 'none',
-    boxShadow: '0 6px 15px rgba(0,0,0,0.1)',
-    transition: 'transform 0.3s ease'
+    color: '#2d3748'
   },
-  greenCard: {
-    background: 'linear-gradient(to right, #48bb78, #38a169)'
+  aboutTitle: {
+    fontSize: '24px',
+    fontWeight: '700',
+    marginBottom: '12px',
+    color: '#4c51bf'
   },
-  purpleCard: {
-    background: 'linear-gradient(to right, #9f7aea, #805ad5)'
-  },
-  yellowCard: {
-    background: 'linear-gradient(to right, #f6ad55, #dd6b20)'
+  aboutText: {
+    fontSize: '16px',
+    lineHeight: '1.6',
+    fontWeight: '500'
   }
+  
 };
 
 const Home = () => {
-  const [userName, setUserName] = useState('');
+
   const [balance, setBalance] = useState(0);
   const backendUrl = 'http://localhost:3000';
+
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
@@ -110,7 +113,7 @@ const Home = () => {
       try {
         const res = await axios.get(`${backendUrl}/user/${userId}`);
         const user = res.data;
-        setUserName(user.name);
+      
         setBalance(user.balance);
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -122,11 +125,7 @@ const Home = () => {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <div style={styles.logo}>🏦 BankVault</div>
-        <div style={styles.welcome}>Welcome, <span style={styles.welcomeSpan}>{userName}</span>!</div>
-        <button style={styles.logoutButton}>🔓 Logout</button>
-      </header>
+    
 
       <section style={styles.balanceSection}>
         <div style={styles.balanceText}>
@@ -137,10 +136,21 @@ const Home = () => {
         </Link>
       </section>
 
-      <section style={styles.navCards}>
-        <Link to="/send-money" style={{ ...styles.card, ...styles.greenCard }}>💸 Send Money</Link>
-        <Link to="/transactions" style={{ ...styles.card, ...styles.purpleCard }}>📄 Transaction History</Link>
-        <Link to="/profile" style={{ ...styles.card, ...styles.yellowCard }}>👤 Profile</Link>
+      <section style={styles.animationSection}>
+        <Player
+  autoplay
+  loop
+  src="https://assets10.lottiefiles.com/packages/lf20_fcfjwiyb.json"
+  style={{ height: '300px', width: '300px' }}
+/>
+
+      </section>
+
+      <section style={styles.aboutSection}>
+        <div style={styles.aboutTitle}>Why Choose Expenses Tracker?</div>
+        <p style={styles.aboutText}>
+           Expenses Tracker is your modern and secure banking partner. Track your transactions, send money instantly, and gain insights into your financial growth. Experience a sleek, user-friendly interface backed by robust technology for peace of mind.
+        </p>
       </section>
     </div>
   );

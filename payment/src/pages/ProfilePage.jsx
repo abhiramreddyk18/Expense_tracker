@@ -1,14 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
+import { logout } from '../auth';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [Income,setIncome]=useState(null);
   const [Expense,setExpense]=useState(null);
   const [Savings,setSavings]=useState(null);
+
+
+const navigate = useNavigate();;
+
   const backendUrl = 'http://localhost:3000';
+  
   const userId = localStorage.getItem("userId");
+
+
+  const handleLogout = () => {
+    logout();            
+    navigate('/login');   
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -42,12 +54,7 @@ const ProfilePage = () => {
 
  
   fetchTransactionSummary();
-
-
-
-
-
-  },[]);
+},[]);
 
   if (user==null) return <p>Loading...</p>;
 
@@ -158,8 +165,8 @@ const ProfilePage = () => {
       <div style={sectionStyle}>
         <h3 style={{ marginBottom: '10px' }}>⚙️ Actions</h3>
         <button style={buttonStyle}>Edit Profile</button>
-        <button style={{ ...buttonStyle, backgroundColor: '#28a745' }}>Reset PIN</button>
-        <button style={{ ...buttonStyle, backgroundColor: '#dc3545' }}>Logout</button>
+        <button style={{ ...buttonStyle, backgroundColor: '#28a745' }} onClick={()=>{navigate('/resetpin')}}>Reset PIN</button>
+        <button style={{ ...buttonStyle, backgroundColor: '#dc3545' }} onClick={()=>{handleLogout}}>Logout</button>
       </div>
     </div>
   );
