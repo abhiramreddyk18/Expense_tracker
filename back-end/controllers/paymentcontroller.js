@@ -117,6 +117,12 @@ exports.sending_money = async (req, res) => {
 exports.setTransactionPin = async (req, res) => {
   const { userId, userpin } = req.body;
 
+
+  
+if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
+  return res.status(400).json({ error: 'Invalid user ID' });
+}
+
   if (!userpin || userpin.length !== 4) {
     return res.status(400).json({ message: "PIN must be 4 digits" });
   }
@@ -247,7 +253,10 @@ exports.recent_payments=async (req, res) => {
 
   const { userId } = req.params;
   
-
+    
+if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
+  return res.status(400).json({ error: 'Invalid user ID' });
+}
 
   try {
    

@@ -38,6 +38,11 @@ exports.search_user_by_id = async (req, res) => {
       
   try {
 
+    
+if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
+  return res.status(400).json({ error: 'Invalid user ID' });
+}
+
     const user = await  User.findById(userId);
 
 

@@ -1,6 +1,7 @@
 
 import React, { useState,useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { login,isLoggedIn} from '../auth'
 function LoginForm() {
 
   const navigate = useNavigate();
@@ -12,11 +13,12 @@ function LoginForm() {
   const backendUrl = 'http://localhost:3000';
  const [loading, setLoading] = useState(false);
 useEffect(() => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    navigate('/home');
+  if (isLoggedIn()) {
+    navigate('/home', { replace: true });
   }
-}, [navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
 
   const handleEmailChange = (e) => {
     setemail(e.target.value);
@@ -68,6 +70,7 @@ useEffect(() => {
 
       const data = await response.json();
       if (data.verified) {
+        login(data.token);
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('userEmail', email);

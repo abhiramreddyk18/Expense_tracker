@@ -4,6 +4,7 @@ const TOKEN_TIME_KEY = 'tokenTime';
 const EXPIRY_DAYS = 7;
 
 export const login = (token) => {
+  console.log("logging in");
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(TOKEN_TIME_KEY, Date.now().toString());
 };
@@ -11,6 +12,8 @@ export const login = (token) => {
 export const logout = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(TOKEN_TIME_KEY);
+    localStorage.removeItem('userId');
+  localStorage.removeItem('userEmail');
 };
 
 export const getToken = () => {

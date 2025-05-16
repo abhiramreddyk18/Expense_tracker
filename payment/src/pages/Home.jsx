@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+
 import { Player } from '@lottiefiles/react-lottie-player';
 ;
 
@@ -132,7 +133,7 @@ const Home = () => {
           💰 Current Balance: <span style={styles.balanceAmount}>₹ {balance.toLocaleString()}</span>
         </div>
         <Link to="/insights" style={styles.insightsLink}>
-          👁️ View Insights
+          View Insights
         </Link>
       </section>
 

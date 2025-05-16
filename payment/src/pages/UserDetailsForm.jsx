@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+
 const UserDetailsForm = () => {
   
   const [formData, setFormData] = useState({
@@ -28,6 +29,8 @@ const UserDetailsForm = () => {
 
     const data = await response.json();
     if (data.success) {
+      localStorage.setItem('userbankid', data.bankdetails);
+       localStorage.setItem('name', data.name);
       navigate('/home');
     } else {
       alert(data.message);

@@ -52,7 +52,7 @@ exports.verify_bank_details = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    
+    const name=fakeBank.name;
     const newUserBank = new UserBank({
       userId: user._id,
       name: fakeBank.name,
@@ -76,6 +76,7 @@ exports.verify_bank_details = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Bank details connected successfully",
+      name,
       user
     });
 

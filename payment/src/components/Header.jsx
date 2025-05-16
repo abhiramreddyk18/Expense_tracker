@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
+import { isLoggedIn } from '../auth'
 
 const Header = () => {
   const navigate = useNavigate();
-  const userName = localStorage.getItem('user') || 'User';
+  const userName = localStorage.getItem('name') || 'User';
 
   const styles = {
     header: {
@@ -61,6 +62,7 @@ const Header = () => {
           💰Expenses Tracker
         </div>
 
+        {isLoggedIn() && (
         <nav style={styles.nav}>
           <button
             onClick={() => navigate('/searchuser')}
@@ -71,7 +73,6 @@ const Header = () => {
             Send Money
           </button>
 
-          
           <button
             onClick={() => navigate('/transactions')}
             style={styles.navButton}
@@ -80,6 +81,7 @@ const Header = () => {
           >
             Transactions
           </button>
+
           <button
             onClick={() => navigate('/profile')}
             style={styles.navButton}
@@ -89,6 +91,7 @@ const Header = () => {
             Profile
           </button>
         </nav>
+      )}
       </div>
 
       <div style={styles.userSection}>

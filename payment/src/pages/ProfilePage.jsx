@@ -166,7 +166,7 @@ const navigate = useNavigate();;
         <h3 style={{ marginBottom: '10px' }}>⚙️ Actions</h3>
         <button style={buttonStyle}>Edit Profile</button>
         <button style={{ ...buttonStyle, backgroundColor: '#28a745' }} onClick={()=>{navigate('/resetpin')}}>Reset PIN</button>
-        <button style={{ ...buttonStyle, backgroundColor: '#dc3545' }} onClick={()=>{handleLogout}}>Logout</button>
+        <button style={{ ...buttonStyle, backgroundColor: '#dc3545' }} onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );
