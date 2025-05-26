@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import TransactionItem from '../components/TransactionItem';
+import { CiBank } from "react-icons/ci";
 
 const styles = {
   container: {
@@ -9,12 +10,15 @@ const styles = {
     margin: '0 auto',
     fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
   },
-  heading: {
-    textAlign: 'center',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    marginBottom: '8px'
-  },
+ heading: {
+  display: 'flex',
+  alignItems: 'center',
+  fontSize: '24px',
+  fontWeight: '700',
+  color: '#4c51bf',
+  marginBottom: '16px',
+  gap: '8px' 
+ },
   balance: {
     textAlign: 'center',
     fontSize: '32px',
@@ -104,7 +108,7 @@ const TransactionHistory = () => {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>💼 Bank Balance</h2>
+      <h2 style={styles.heading}> <CiBank />Bank Balance</h2>
       <h1 style={styles.balance}>₹ {balance}</h1>
 
       <div style={styles.filterGrid}>

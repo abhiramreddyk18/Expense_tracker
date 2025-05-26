@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { GiTakeMyMoney } from "react-icons/gi";
 
 import { Player } from '@lottiefiles/react-lottie-player';
 ;
@@ -97,7 +98,16 @@ const styles = {
     fontSize: '16px',
     lineHeight: '1.6',
     fontWeight: '500'
-  }
+  },
+  balanceText: {
+  fontSize: '20px',
+  fontWeight: '600',
+  color: '#2d3748',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px'  
+}
+
   
 };
 
@@ -128,14 +138,15 @@ const Home = () => {
     <div style={styles.container}>
     
 
-      <section style={styles.balanceSection}>
-        <div style={styles.balanceText}>
-          💰 Current Balance: <span style={styles.balanceAmount}>₹ {balance.toLocaleString()}</span>
-        </div>
-        <Link to="/insights" style={styles.insightsLink}>
-          View Insights
-        </Link>
-      </section>
+     <section style={styles.balanceSection}>
+  <div style={styles.balanceText}>
+    <GiTakeMyMoney size={30} />
+    Current Balance: <span style={styles.balanceAmount}>₹ {balance.toLocaleString()}</span>
+  </div>
+  <Link to="/insights" style={styles.insightsLink}>
+    View Insights
+  </Link>
+</section>
 
       <section style={styles.animationSection}>
         <Player

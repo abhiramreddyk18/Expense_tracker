@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
 import { isLoggedIn } from '../auth'
+import { FaMoneyBillTrendUp } from "react-icons/fa6";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -53,19 +54,22 @@ const Header = () => {
       fontSize: '16px',
       marginRight: '40px',
     },
+    logoicon:{
+      margin:'10px'
+    }
   };
 
   return (
     <header style={styles.header}>
       <div style={styles.leftSection}>
         <div style={styles.brand} onClick={() => navigate('/')}>
-          💰Expenses Tracker
+         <div style={styles.logoicon}><FaMoneyBillTrendUp /></div>  Expenses Tracker
         </div>
 
         {isLoggedIn() && (
         <nav style={styles.nav}>
           <button
-            onClick={() => navigate('/searchuser')}
+            onClick={() => navigate('/send-money')}
             style={styles.navButton}
             onMouseOver={(e) => (e.target.style.opacity = 0.8)}
             onMouseOut={(e) => (e.target.style.opacity = 1)}

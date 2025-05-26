@@ -14,6 +14,8 @@ import Insigths from './pages/Insigths';
 import Header from './components/Header';
 import ResetPin from './components/Resetpin';
 import PrivateRoute from './PrivateRoute';
+import SearchUserPage from './pages/SearchUserPage';
+
 import { Navigate } from 'react-router-dom';
 
 
@@ -35,8 +37,6 @@ function App() {
           <Route path="/setpin" element={<SetPin/>}></Route>
           <Route path="/bankfrom" element={<UserDetailsForm />}></Route>
           <Route path="/calender" element={<CalendarPage/>}></Route>
-          
-          <Route path="/searchuser" element={<SearchUser/>}></Route>
           <Route path="/insights" element={<Insigths/>}></Route>
           <Route path="/profile" element={<ProfilePage/>}></Route>
              <Route path="/resetpin" element={<ResetPin/>}></Route>
