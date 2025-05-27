@@ -8,13 +8,12 @@ import ConfirmPin from './components/ConfirmPin';
 import SetPin from './components/Setpin';
 import UserDetailsForm from './pages/UserDetailsForm';
 import CalendarPage from './pages/CalendarPage';
-import SearchUser from './components/SearchUser';
 import ProfilePage from './pages/ProfilePage';
 import Insigths from './pages/Insigths';
 import Header from './components/Header';
 import ResetPin from './components/Resetpin';
 import PrivateRoute from './PrivateRoute';
-import SearchUserPage from './pages/SearchUserPage';
+
 
 import { Navigate } from 'react-router-dom';
 

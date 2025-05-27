@@ -30,7 +30,7 @@ exports.sending_money = async (req, res) => {
     if (!senderId || !receiverId || !amount || !pin) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-    
+  
     const sender = await UserBank.findById(senderId);
     const receiver = await UserBank.findById(receiverId);
  
@@ -134,41 +134,9 @@ if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
 };
 
 
-
-
-// exports.recent_payments = async (req, res) => {
-
-//   const { userId } = req.params;
-
-//   try {
-    
-//     const recentPayments = await Transaction.find({
-//       $or: [{ userId: userId }, { relatedUser: userId }] 
-//     })
-//       .populate('userId', 'name') 
-//       .populate('relatedUser', 'name') 
-//       .sort({ date: -1 }) 
-//       .select('userId relatedUser type amount date'); 
-
-
-//     res.json({ payments: recentPayments });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Error fetching recent payments' });
-//   }
-// }
-
-
 exports.searchTransactions = async (req, res) => {
   try {
-    const {
-      type,
-      category,
-      year,
-      month,
-      date,
-      userId
-    } = req.query;
+    const { type, category, year, month, date, userId } = req.query;
 
     if (!userId) {
       return res.status(400).json({ message: "Missing userId" });
@@ -181,10 +149,10 @@ exports.searchTransactions = async (req, res) => {
       return res.status(404).json({ message: "Bank account not found for user" });
     }
 
-    
-    const query = { userId: new mongoose.Types.ObjectId(bankUser._id) };
+    const query = {
+      userId: bankUser._id,
+    };
 
-    
     if (type) query.type = type;
     if (category) query.category = category;
     if (year) query.year = Number(year);
@@ -198,21 +166,53 @@ exports.searchTransactions = async (req, res) => {
       query.date = { $gte: specificDate, $lte: endOfDay };
     }
 
-    
-    const transactions = await Transaction.find(query);
+    const transactions = await Transaction.find(query).sort({ date: -1 });
 
     let balance = 0;
-    for (const txn of transactions) {
-      if (txn.type === "income") balance += txn.amount;
-      else if (txn.type === "expense") balance -= txn.amount;
-    }
 
-    return res.status(200).json({ transactions, balance });
+    const detailedTransactions = await Promise.all(
+      transactions.map(async (txn) => {
+        
+        if (txn.type === "income") {
+          balance += txn.amount;
+        } else if (txn.type === "expense") {
+          balance -= txn.amount;
+        }
+
+        
+        let otherUserInfo = null;
+          console.log("id of the rele user: " + txn.relatedUser);
+        if (txn.relatedUser) {  
+          otherUserInfo = await UserBank.findById(txn.relatedUser);
+        }
+        
+        
+        
+       
+
+        return {
+          _id: txn._id,
+          date: txn.date,
+          amount: txn.amount,
+          type: txn.type,
+          category: txn.category,
+          name: otherUserInfo?.name || "Unknown",
+          phoneNumber: otherUserInfo?.phoneNumber || "N/A"
+        };
+      })
+    );
+
+    return res.status(200).json({
+      transactions: detailedTransactions,
+      balance
+    });
+
   } catch (error) {
     console.error("Error searching transactions:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 
@@ -248,20 +248,15 @@ exports.setPin = async (req, res) => {
 }
 
 
-
-exports.recent_payments=async (req, res) => {
-
+exports.recent_payments = async (req, res) => {
   const { userId } = req.params;
-  
-    
-if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
-  return res.status(400).json({ error: 'Invalid user ID' });
-}
+
+  if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
 
   try {
-   
     const user = await User.findById(userId);
-
     if (!user || !user.bankdetails) {
       return res.status(404).json({ error: 'User or bank details not found' });
     }
@@ -272,41 +267,47 @@ if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
     const transactions = await Transaction.find({
       $or: [
         { userId: userBankId },
+        { relatedUser: userBankId }
       ]
     })
       .sort({ date: -1 })
-      .limit(10);
+      .limit(5); 
 
-    const payments = await Promise.all(
-      transactions.map(async (tx) => {
-        const isSender = String(tx.userId) === String(userBankId);
-        const otherBankId = isSender ? tx.relatedUser : tx.userId;
+    const seen = new Set();
+    const filteredPayments = [];
 
-        let otherUser = null;
-        let otherUserBank = null;
+    for (const tx of transactions) {
+      const txIdPair = [tx.userId, tx.relatedUser].sort().join('-');
+      if (seen.has(txIdPair)) continue;
+      seen.add(txIdPair);
 
-        if (otherBankId) {
-          otherUser = await User.findOne({ bankdetails: otherBankId });
-          otherUserBank = await UserBank.findById(otherBankId);
-        }
+      const isSender = String(tx.userId) === String(userBankId);
+      const otherBankId = isSender ? tx.relatedUser : tx.userId;
 
-        return {
-          _id: tx._id,
-          amount: tx.amount,
-          category: tx.category,
-          type: isSender ? 'sent' : 'received',
-          otherUserName: otherUserBank?.name || 'Unknown',
-          otherUserPhone: otherUserBank?.phoneNumber || 'N/A',
-          date: tx.date
-        };
-      })
-    );
+      let otherUserBank = null;
 
-    return res.status(200).json({ payments });
+      if (otherBankId) {
+        otherUserBank = await UserBank.findById(otherBankId);
+      }
+
+      filteredPayments.push({
+        _id: tx._id,
+        amount: tx.amount,
+        category: tx.category,
+        type: isSender ? 'sent' : 'received',
+        otherUserName: otherUserBank?.name || 'Unknown',
+        otherUserPhone: otherUserBank?.phoneNumber || 'N/A',
+        date: tx.date
+      });
+
+      // Stop at 5 filtered transactions
+      if (filteredPayments.length >= 5) break;
+    }
+
+    return res.status(200).json({ payments: filteredPayments });
 
   } catch (err) {
     console.error('Error fetching transactions:', err);
     return res.status(500).json({ error: 'Server error' });
   }
-}
-
+};

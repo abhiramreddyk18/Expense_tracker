@@ -51,7 +51,7 @@ if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
     }
 
     const userbank=await UserBank.findById(user.bankdetails);
-
+    console.log(userbank);
     
     res.json(userbank);
 

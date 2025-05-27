@@ -173,7 +173,7 @@ exports.getcategorySum = async (req, res) => {
       }
     ]);
 
-    // Format the data to send it to the frontend
+  
     const formattedSummary = summary.map(item => ({
       category: item._id.category,
       type: item._id.type,
@@ -186,3 +186,37 @@ exports.getcategorySum = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch category summary." });
   }
 };
+
+
+
+
+const CategoryLimit = require('../models/limitSchema');
+
+
+exports.getCategoryLimits = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const limits = await CategoryLimit.find({ userId });
+    res.json(limits);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch limits' });
+  }
+};
+
+
+exports.saveOrUpdateCategoryLimit = async (req, res) => {
+  const { userId } = req.params;
+  const { category, limitAmount } = req.body;
+
+  try {
+    const updated = await CategoryLimit.findOneAndUpdate(
+      { userId, category },
+      { limitAmount },
+      { new: true, upsert: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save limit' });
+  }
+};
+
