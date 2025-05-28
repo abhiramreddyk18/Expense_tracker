@@ -28,7 +28,7 @@ function App() {
       <BrowserRouter>
        <Header/>
         <Routes>
-          <Route path="/" element={<LoginForm/>}></Route>
+          <Route path="/" element={<Home/>}></Route>
           <Route path="/send-money" element={<SendMoneyPage />}></Route>
           <Route path="/login" element={<LoginForm />}></Route>
           <Route path="/transactions" element={<TransactionHistory />}></Route>

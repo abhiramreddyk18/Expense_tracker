@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
-import { isLoggedIn } from '../auth'
+import { isLoggedIn } from '../auth';
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 
 const Header = () => {
@@ -50,12 +50,22 @@ const Header = () => {
     userSection: {
       display: 'flex',
       alignItems: 'center',
-      gap: '8px',
+      gap: '12px',
       fontSize: '16px',
       marginRight: '40px',
     },
-    logoicon:{
-      margin:'10px'
+    logoicon: {
+      margin: '10px'
+    },
+    loginButton: {
+      background: 'none',
+      border: '1px solid white',
+      borderRadius: '4px',
+      color: 'white',
+      fontSize: '14px',
+      padding: '6px 12px',
+      cursor: 'pointer',
+      transition: 'opacity 0.2s',
     }
   };
 
@@ -63,44 +73,56 @@ const Header = () => {
     <header style={styles.header}>
       <div style={styles.leftSection}>
         <div style={styles.brand} onClick={() => navigate('/')}>
-         <div style={styles.logoicon}><FaMoneyBillTrendUp /></div>  Expenses Tracker
+          <div style={styles.logoicon}><FaMoneyBillTrendUp /></div>
+          Expenses Tracker
         </div>
 
         {isLoggedIn() && (
-        <nav style={styles.nav}>
-          <button
-            onClick={() => navigate('/send-money')}
-            style={styles.navButton}
-            onMouseOver={(e) => (e.target.style.opacity = 0.8)}
-            onMouseOut={(e) => (e.target.style.opacity = 1)}
-          >
-            Send Money
-          </button>
+          <nav style={styles.nav}>
+            <button
+              onClick={() => navigate('/send-money')}
+              style={styles.navButton}
+              onMouseOver={(e) => (e.target.style.opacity = 0.8)}
+              onMouseOut={(e) => (e.target.style.opacity = 1)}
+            >
+              Send Money
+            </button>
 
-          <button
-            onClick={() => navigate('/transactions')}
-            style={styles.navButton}
-            onMouseOver={(e) => (e.target.style.opacity = 0.8)}
-            onMouseOut={(e) => (e.target.style.opacity = 1)}
-          >
-            Transactions
-          </button>
+            <button
+              onClick={() => navigate('/transactions')}
+              style={styles.navButton}
+              onMouseOver={(e) => (e.target.style.opacity = 0.8)}
+              onMouseOut={(e) => (e.target.style.opacity = 1)}
+            >
+              Transactions
+            </button>
 
-          <button
-            onClick={() => navigate('/profile')}
-            style={styles.navButton}
-            onMouseOver={(e) => (e.target.style.opacity = 0.8)}
-            onMouseOut={(e) => (e.target.style.opacity = 1)}
-          >
-            Profile
-          </button>
-        </nav>
-      )}
+            <button
+              onClick={() => navigate('/profile')}
+              style={styles.navButton}
+              onMouseOver={(e) => (e.target.style.opacity = 0.8)}
+              onMouseOut={(e) => (e.target.style.opacity = 1)}
+            >
+              Profile
+            </button>
+          </nav>
+        )}
       </div>
 
       <div style={styles.userSection}>
         <FaUserCircle size={24} />
         <span>{userName}</span>
+
+        {!isLoggedIn() && (
+          <button
+            onClick={() => navigate('/login')}
+            style={styles.loginButton}
+            onMouseOver={(e) => (e.target.style.opacity = 0.8)}
+            onMouseOut={(e) => (e.target.style.opacity = 1)}
+          >
+            Login
+          </button>
+        )}
       </div>
     </header>
   );
