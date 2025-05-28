@@ -3,7 +3,8 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const UserBank = require('../models/UserLinkedBank');
 const mongoose = require("mongoose");
-const { verify } = require('crypto');
+
+const bankdetails=require('../models/bankdetails');
 const generateTransactionId = () => {
   return "TXN" + Date.now() + Math.floor(Math.random() * 1000);
 };
@@ -33,6 +34,9 @@ exports.sending_money = async (req, res) => {
   
     const sender = await UserBank.findById(senderId);
     const receiver = await UserBank.findById(receiverId);
+
+    const realbanksender=await bankdetails.find({phonenumber:sender.phoneNumber});
+    const realbankreceiver=await bankdetails.find({phonenumber:sender.phoneNumber});
  
     if (!sender || !receiver) {
       return res.status(404).json({ message: "Sender or Receiver not found" });
@@ -55,6 +59,9 @@ exports.sending_money = async (req, res) => {
     
     sender.balance -= amount;
     receiver.balance += amount;
+
+    realbanksender.balance -= amount;
+   realbankreceiver.balance += amount;
 
     await sender.save();
     await receiver.save();

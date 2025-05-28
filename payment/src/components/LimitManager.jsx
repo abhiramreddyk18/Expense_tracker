@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import axios from 'axios';
 
 const LimitManager = ({ limitsData, setLimitsData, userId, backendUrl, availableCategories }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [limitAmount, setLimitAmount] = useState('');
+
+
+  const handleDeleteLimit = async (categoryToDelete) => {
+  const confirmDelete = window.confirm(`Are you sure you want to delete the limit for "${categoryToDelete}"?`);
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(`${backendUrl}/bank/category-limits/${userId}/${categoryToDelete}`);
+    setLimitsData(prev => prev.filter(item => item.category !== categoryToDelete));
+    alert('Limit deleted successfully!');
+  } catch (error) {
+    console.error('Error deleting limit:', error);
+    alert('Failed to delete limit');
+  }
+};
+
 
   const handleAddLimit = async () => {
     if (!selectedCategory) {
@@ -161,25 +177,41 @@ const LimitManager = ({ limitsData, setLimitsData, userId, backendUrl, available
         </p>
       ) : (
         limitsData.map(({ category, limit }, idx) => (
-          <div
-            key={idx}
-            style={{
-              padding: '14px 18px',
-              marginBottom: 12,
-              borderRadius: 8,
-              backgroundColor: '#f5f6fa',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              fontSize: 16,
-              fontWeight: '500',
-              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)'
-            }}
-          >
-            <span>{category}</span>
-            <span style={{ color: '#3f51b5', fontWeight: '700' }}>₹{limit.toFixed(2)}</span>
-          </div>
-        ))
+  <div
+    key={idx}
+    style={{
+      padding: '14px 18px',
+      marginBottom: 12,
+      borderRadius: 8,
+      backgroundColor: '#f5f6fa',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      fontSize: 16,
+      fontWeight: '500',
+      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)'
+    }}
+  >
+    <span>{category}</span>
+    <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <span style={{ color: '#3f51b5', fontWeight: '700' }}>₹{limit.toFixed(2)}</span>
+      <button
+        onClick={() => handleDeleteLimit(category)}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          color: '#e53935',
+          cursor: 'pointer',
+          fontSize: 18,
+          fontWeight: 'bold',
+        }}
+        title="Delete Limit"
+      >
+        ❌
+      </button>
+    </span>
+  </div>
+))
       )}
     </div>
   );

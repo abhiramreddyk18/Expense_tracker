@@ -15,9 +15,7 @@ const Insights = () => {
 
   const userId = localStorage.getItem('userId');
   const backendUrl = 'http://localhost:3000';
-
-  // Hardcoded categories - replace with backend fetch if needed
-  const categories = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills'];
+  const categories = ['Food', 'Bills', 'Shopping', 'Travel', 'Education', 'Health', 'Salary', 'Other'];
 
   useEffect(() => {
     if (!userId) {
@@ -27,32 +25,29 @@ const Insights = () => {
 
     const fetchData = async () => {
       try {
-        // Fetch category summary
         const res = await axios.get(`${backendUrl}/bank/category-summary/${userId}?days=${days}`);
-        console.log('Category summary data:', res.data);
-
         const incomeData = [], expenseData = [];
+
         res.data.forEach(item => {
           if (item.type === 'Income') {
-            incomeData.push({ category: `${item.category} (Income)`, totalAmount: item.totalAmount });
+            incomeData.push({ category: `${item.category} (income)`, totalAmount: item.totalAmount });
           } else {
-            expenseData.push({ category: `${item.category} (Expense)`, totalAmount: item.totalAmount });
+            expenseData.push({ category: `${item.category} (expense)`, totalAmount: item.totalAmount });
           }
         });
+
         setCategoryData([...incomeData, ...expenseData]);
 
-        // Fetch category limits
         const limitsRes = await axios.get(`${backendUrl}/bank/category-limits/${userId}`);
-        console.log('Category limits data:', limitsRes.data);
-
         const mergedData = limitsRes.data.map(limitItem => {
-          const matched = res.data.find(s => s.category === limitItem.category && s.type === 'Expense');
+          const matched = res.data.find(s => s.category === limitItem.category && s.type === 'expense');
           return {
             category: limitItem.category,
             limit: limitItem.limitAmount,
             spent: matched ? matched.totalAmount : 0
           };
         });
+
         setLimitsData(mergedData);
       } catch (err) {
         console.error('Error loading insights:', err);
@@ -63,7 +58,7 @@ const Insights = () => {
   }, [days, userId]);
 
   if (!userId) {
-    return <p style={{textAlign: 'center', marginTop: '50px'}}>Please login to view insights.</p>;
+    return <p style={{ textAlign: 'center', marginTop: '50px' }}>Please login to view insights.</p>;
   }
 
   return (
@@ -82,9 +77,10 @@ const Insights = () => {
         marginBottom: '30px',
         color: '#2c3e50',
         fontWeight: '600'
-      }}>📊 Spending Insights</h2>
+      }}>
+        📊 Spending Insights
+      </h2>
 
-      {/* Days Filter */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -112,7 +108,6 @@ const Insights = () => {
         <span style={{ fontWeight: '500' }}>days</span>
       </div>
 
-      {/* Pie Chart */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '50px' }}>
         <PieChart width={500} height={350}>
           <Pie
@@ -134,9 +129,10 @@ const Insights = () => {
         </PieChart>
       </div>
 
-      {/* Bar Chart */}
       <div>
-        <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#2c3e50' }}>💸 Category Limit vs Spending</h3>
+        <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#2c3e50' }}>
+          💸 Category Limit vs Spending
+        </h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={limitsData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -150,12 +146,7 @@ const Insights = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Limit Manager Section */}
-      <div style={{
-        marginTop: '50px',
-        padding: '20px',
-        borderTop: '1px solid #ccc'
-      }}>
+      <div style={{ marginTop: '50px', padding: '20px', borderTop: '1px solid #ccc' }}>
         <LimitManager
           limitsData={limitsData}
           setLimitsData={setLimitsData}

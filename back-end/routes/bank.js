@@ -7,7 +7,8 @@ const {
   getSummaryForLastNDays,
   getcategorySum,
   getCategoryLimits,      // new controller to get limits
-  saveOrUpdateCategoryLimit // new controller to save/update limit
+  saveOrUpdateCategoryLimit,
+   deleteCategoryLimit 
 } = require("../controllers/bankcontroller");
 
 // Existing routes
@@ -19,5 +20,7 @@ router.get('/category-summary/:userId', getcategorySum);
 // New routes for category limits
 router.get('/category-limits/:userId', getCategoryLimits);
 router.post('/category-limits/:userId', saveOrUpdateCategoryLimit);
+router.delete('/category-limits/:userId/:category', deleteCategoryLimit);
+
 
 module.exports = router;

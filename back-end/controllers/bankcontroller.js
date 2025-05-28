@@ -220,3 +220,23 @@ exports.saveOrUpdateCategoryLimit = async (req, res) => {
   }
 };
 
+
+
+
+
+exports.deleteCategoryLimit = async (req, res) => {
+  const { userId, category } = req.params;
+
+  try {
+    const deleted = await CategoryLimit.findOneAndDelete({ userId, category });
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Limit not found for the given category' });
+    }
+
+    res.status(200).json({ message: 'Limit deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting limit:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
