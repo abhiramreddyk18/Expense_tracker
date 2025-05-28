@@ -16,7 +16,7 @@ useEffect(() => {
   if (isLoggedIn()) {
     navigate('/home', { replace: true });
   }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
 }, []);
 
 
