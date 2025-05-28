@@ -1,6 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ConfirmPin = () => {
   const { state } = useLocation();
@@ -9,6 +11,7 @@ const ConfirmPin = () => {
   const [senderbankid, setsenderbankid] = useState(null);
   const navigate = useNavigate();
   const backendUrl = 'http://localhost:3000';
+  
 
   useEffect(() => {
     console.log("Navigation state received:", state);
@@ -23,30 +26,35 @@ const ConfirmPin = () => {
         setsenderbankid(userbank._id);
 
         if (!userbank.pin) {
-          alert("You need to set your PIN before making transactions.");
-          navigate("/setpin", {
-            state: {
-              senderId: state?.senderId,
-            },
-          });
+          toast.info("You need to set your PIN before making transactions.");
+          setTimeout(() => {
+            navigate("/setpin", {
+              state: { senderId: state?.senderId },
+            });
+          }, 2000); // Wait 2 seconds before navigation
         } else {
           setLoading(false);
         }
       } catch (err) {
-        alert("Unable to verify PIN setup. Please try again.");
-        navigate("/send-money");
+        toast.error("Unable to verify PIN setup. Please try again.");
+        setTimeout(() => {
+          navigate("/send-money");
+        }, 2000);
       }
     };
 
     if (state?.senderId) {
       checkPinSet();
     } else {
-      alert("Invalid access");
-      navigate("/send-money");
+      toast.error("Invalid access");
+      setTimeout(() => {
+        navigate("/send-money");
+      }, 2000);
     }
   }, [state?.senderId, navigate]);
 
   const handleConfirm = async () => {
+    const toastId = toast.loading("Processing your transaction...");
     try {
       await axios.post(`${backendUrl}/payment/send_money`, {
         senderId: senderbankid,
@@ -57,11 +65,18 @@ const ConfirmPin = () => {
         pin
       });
 
-      alert("Money sent successfully");
-      navigate("/searchuser");
+    toast.update(toastId, {
+      render: "Money sent successfully",
+      type: "success",
+      isLoading: false,
+      autoClose: 3000,
+    });
+      setTimeout(() => {
+        navigate("/searchuser");
+      }, 2000);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Transaction failed");
+      toast.error(err.response?.data?.message || "Transaction failed");
     }
   };
 
@@ -88,11 +103,11 @@ const ConfirmPin = () => {
       >
         Confirm & Send
       </button>
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar />
     </div>
   );
 };
 
-// CSS styles as JS object
 const styles = {
   container: {
     maxWidth: '400px',

@@ -120,7 +120,7 @@ const Home = () => {
       margin: '0 auto 24px'
     }}
   >
-    ExpenseTracker is your personal finance assistant. It helps you track and categorize every transaction you make while sending money to others. You can assign categories (like food, travel, shopping, etc.) to your expenses and monitor your financial habits.
+    Expense Trackering System is your personal finance assistant. It helps you track and categorize every transaction you make while sending money to others. You can assign categories (like food, travel, shopping, etc.) to your expenses and monitor your financial habits.
   </p>
 
   <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '12px', color: '#2b6cb0' }}>Features:</h3>
@@ -140,7 +140,7 @@ const Home = () => {
     </li>
     <li style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
       <BiSolidCategory size={20} style={{ marginRight: '12px', color: '#4299e1' }} />
-      View categorized spending in the <strong style={{ marginLeft: '4px' }}>Insights</strong> page
+      View categorized spending in the <strong style={{ marginLeft: '4px', marginRight: '4px' }}>Insights</strong>  page
     </li>
     <li style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
       <BsGraphUp size={20} style={{ marginRight: '12px', color: '#805ad5' }} />
@@ -168,7 +168,7 @@ const Home = () => {
           fontSize: '14px'
         }}
       >
-        © {new Date().getFullYear()} ExpenseTracker. Built with 💙 to help you manage your money smarter.
+        © {new Date().getFullYear()} Expense Trackering System. Built with 💙 to help you manage your money smarter.
       </footer>
     </div>
   );

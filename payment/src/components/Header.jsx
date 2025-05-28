@@ -73,9 +73,15 @@ const Header = () => {
     <header style={styles.header}>
       <div style={styles.leftSection}>
         <div style={styles.brand} onClick={() => navigate('/')}>
-          <div style={styles.logoicon}><FaMoneyBillTrendUp /></div>
-          Expenses Tracker
-        </div>
+  <div style={styles.logoicon}>
+    <FaMoneyBillTrendUp />
+  </div>
+  
+  <div style={{ padding: '5px'}}>
+    <div style={{ fontSize: '20px', fontWeight: 'bold' }}>PayOLog   <sub style={{ fontSize: '12px' }}>E T S</sub></div>
+    
+  </div>
+</div>
 
         {isLoggedIn() && (
           <nav style={styles.nav}>
@@ -97,26 +103,22 @@ const Header = () => {
               Transactions
             </button>
 
-            <button
-              onClick={() => navigate('/profile')}
-              style={styles.navButton}
-              onMouseOver={(e) => (e.target.style.opacity = 0.8)}
-              onMouseOut={(e) => (e.target.style.opacity = 1)}
-            >
-              Profile
-            </button>
+           
           </nav>
         )}
       </div>
 
       <div style={styles.userSection}>
-        <FaUserCircle size={24} />
-        <span>{userName}</span>
-
-        {!isLoggedIn() && (
+            {isLoggedIn() ? (
+          <>
+          
+            <FaUserCircle size={24} onClick={() => navigate('/profile')} />
+            <span>{userName}</span>
+          </>
+        ) : (
           <button
             onClick={() => navigate('/login')}
-            style={styles.loginButton}
+            style={styles.navButton}
             onMouseOver={(e) => (e.target.style.opacity = 0.8)}
             onMouseOut={(e) => (e.target.style.opacity = 1)}
           >
