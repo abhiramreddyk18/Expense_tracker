@@ -55,56 +55,53 @@ const TransactionHistory = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 font-sans">
-      <h2 className="flex items-center text-2xl font-bold text-indigo-600 mb-4 gap-2">
+    <div className="p-6 max-w-3xl mx-auto font-sans">
+      <h2 className="flex items-center text-2xl font-extrabold text-indigo-700 mb-4 gap-2">
         <CiBank /> Bank Balance
       </h2>
-      <h1 className="text-center text-4xl font-semibold text-green-600 mb-6">
+      <h1 className="text-center text-4xl text-green-600 font-semibold mb-6">
         ₹ {balance}
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <label className="flex flex-col text-sm text-gray-700">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 mb-6">
+        <label className="flex flex-col text-sm text-gray-800">
           Date
           <input
             type="date"
             name="date"
             onChange={handleFilterChange}
-            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="border border-gray-300 rounded-md p-2 mt-1 text-sm"
             value={filters.date}
           />
         </label>
-
-        <label className="flex flex-col text-sm text-gray-700">
+        <label className="flex flex-col text-sm text-gray-800">
           Year
           <input
             type="number"
             name="year"
             placeholder="e.g., 2025"
             onChange={handleFilterChange}
-            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="border border-gray-300 rounded-md p-2 mt-1 text-sm"
             value={filters.year}
           />
         </label>
-
-        <label className="flex flex-col text-sm text-gray-700">
+        <label className="flex flex-col text-sm text-gray-800">
           Month
           <input
             type="number"
             name="month"
             placeholder="1-12"
             onChange={handleFilterChange}
-            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="border border-gray-300 rounded-md p-2 mt-1 text-sm"
             value={filters.month}
           />
         </label>
-
-        <label className="flex flex-col text-sm text-gray-700">
+        <label className="flex flex-col text-sm text-gray-800">
           Type
           <select
             name="type"
             onChange={handleFilterChange}
-            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="border border-gray-300 rounded-md p-2 mt-1 text-sm"
             value={filters.type}
           >
             <option value="">All Types</option>
@@ -112,13 +109,12 @@ const TransactionHistory = () => {
             <option value="expense">Expense</option>
           </select>
         </label>
-
-        <label className="flex flex-col text-sm text-gray-700">
+        <label className="flex flex-col text-sm text-gray-800">
           Category
           <select
             name="category"
             onChange={handleFilterChange}
-            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="border border-gray-300 rounded-md p-2 mt-1 text-sm"
             value={filters.category}
           >
             <option value="">All Categories</option>
@@ -135,14 +131,13 @@ const TransactionHistory = () => {
         </label>
       </div>
 
-      <h3 className="flex items-center text-xl font-semibold mb-3 gap-2 text-gray-800">
+      <h3 className="flex items-center text-lg font-semibold mb-3 gap-2 text-gray-800">
         <GrTransaction /> Transaction History
       </h3>
-
       {loading ? (
-        <p className="text-gray-600 text-sm">Loading transactions...</p>
+        <p className="text-sm text-gray-600">Loading transactions...</p>
       ) : transactions.length === 0 ? (
-        <p className="text-gray-600 text-sm">No transactions found for selected filters.</p>
+        <p className="text-sm text-gray-600">No transactions found for selected filters.</p>
       ) : (
         transactions.map(txn => (
           <TransactionItem key={txn._id} txn={txn} />

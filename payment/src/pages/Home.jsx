@@ -86,7 +86,7 @@ const Home = () => {
         </ul>
       </section>
 
-      
+      {/* Footer */}
       <footer className="text-center py-5 mt-10 border-t border-gray-300 text-gray-500 text-sm">
         © {new Date().getFullYear()} Expense Trackering System. Built with 💙 to help you manage your money smarter.
       </footer>

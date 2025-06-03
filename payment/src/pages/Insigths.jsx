@@ -18,10 +18,7 @@ const Insights = () => {
   const categories = ['Food', 'Bills', 'Shopping', 'Travel', 'Education', 'Health', 'Salary', 'Other'];
 
   useEffect(() => {
-    if (!userId) {
-      console.warn('No userId found in localStorage');
-      return;
-    }
+    if (!userId) return;
 
     const fetchData = async () => {
       try {
@@ -61,59 +58,81 @@ const Insights = () => {
     return <p className="text-center mt-12 text-lg text-gray-600">Please login to view insights.</p>;
   }
 
+  // Corrected maxExpenseCategory initialization with default spent=0
+  const maxExpenseCategory = limitsData.length > 0
+    ? limitsData.reduce((max, item) =>
+        item.spent > (max.spent || 0) ? item : max, { spent: 0 })
+    : null;
+
   return (
-    <div className="max-w-6xl mx-auto mt-10 p-8 rounded-xl bg-gradient-to-r from-white to-gray-100 shadow-lg font-sans">
-      <h2 className="text-center text-2xl font-semibold text-gray-800 mb-8">📊 Spending Insights</h2>
+  <div className="w-full min-h-screen px-6 py-10 bg-gray-700">
+      <h2 className="text-4xl font-bold text-white mb-8">📊 Spending Insights</h2>
 
-      <div className="flex items-center justify-center mb-6 text-gray-700 text-base">
-        <label className="font-medium mr-2">Show data for last</label>
-        <input
-          type="number"
-          value={days}
-          min="1"
-          onChange={(e) => setDays(Number(e.target.value))}
-          className="w-20 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 mr-2"
-        />
-        <span className="font-medium">days</span>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10 px-6 py-4 bg-neutral-800 rounded-xl shadow-lg text-white">
+
+  <div className="flex items-center gap-4">
+    <label className="font-semibold text-base sm:text-lg">📅 Show data for last</label>
+    <input
+      type="number"
+      value={days}
+      min="1"
+      onChange={(e) => setDays(Number(e.target.value))}
+      className="w-28 px-4 py-2 border border-blue-300 rounded-md shadow-inner text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition duration-200"
+    />
+    <span className="font-semibold text-base sm:text-lg">days</span>
+  </div>
+        {maxExpenseCategory && maxExpenseCategory.spent > 0 && (
+         <div className="text-lg sm:text-xl font-semibold text-red-700 border border-red-400 bg-neutral-800 px-5 py-3 rounded-lg shadow w-fit">
+            🔺 Highest Spending: <span className="font-bold">{maxExpenseCategory.category}</span> — ₹{maxExpenseCategory.spent}
+          </div>
+        )}
+
       </div>
 
-      <div className="flex justify-center mb-12 overflow-x-auto">
-        <PieChart width={500} height={350}>
-          <Pie
-            data={categoryData}
-            dataKey="totalAmount"
-            nameKey="category"
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            innerRadius={60}
-            label
-          >
-            {categoryData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend layout="vertical" align="right" verticalAlign="middle" />
-        </PieChart>
+      <div className="w-full flex flex-col lg:flex-row gap-8 mb-12">
+
+        <div className="w-full lg:w-1/2 p-6 rounded-xl shadow-lg bg-gray-300">
+          <h3 className="text-2xl font-semibold mb-4 text-gray-800">📈 Category-wise Income & Expenses</h3>
+          <div className="flex justify-center">
+            <PieChart width={500} height={400}>
+              <Pie
+                data={categoryData}
+                dataKey="totalAmount"
+                nameKey="category"
+                cx="50%"
+                cy="50%"
+                outerRadius={130}
+                innerRadius={70}
+                label
+              >
+                {categoryData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend layout="vertical" align="right" verticalAlign="middle" />
+            </PieChart>
+          </div>
+        </div>
+
+        <div className="w-full lg:w-1/2 bg-rose-100 p-6 rounded-xl shadow-lg bg-gray-300">
+          <h3 className="text-2xl font-semibold mb-4 text-gray-800">💸 Category Limit vs Spending</h3>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={limitsData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" angle={-20} textAnchor="end" interval={0} height={60} />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="limit" fill="#8884d8" name="Limit" />
+              <Bar dataKey="spent" fill="#ff5e57" name="Spent" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      <div>
-        <h3 className="text-center mb-6 text-lg font-semibold text-gray-800">💸 Category Limit vs Spending</h3>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={limitsData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="category" angle={-20} textAnchor="end" interval={0} height={60} />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="limit" fill="#8884d8" name="Limit" />
-            <Bar dataKey="spent" fill="#ff5e57" name="Spent" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="mt-12 pt-6 border-t border-gray-300">
+      <div className=" p-8 rounded-xl shadow-lg mb-1 bg-gray-300">
+        <h3 className="text-2xl font-semibold mb-5 text-gray-800">🛠️ Set Category Limits</h3>
         <LimitManager
           limitsData={limitsData}
           setLimitsData={setLimitsData}
