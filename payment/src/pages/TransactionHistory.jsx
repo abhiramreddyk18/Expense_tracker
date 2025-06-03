@@ -4,71 +4,6 @@ import TransactionItem from '../components/TransactionItem';
 import { CiBank } from "react-icons/ci";
 import { GrTransaction } from "react-icons/gr";
 
-const styles = {
-  container: {
-    padding: '24px',
-    maxWidth: '768px',
-    margin: '0 auto',
-    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
-  },
-  heading: {
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: '24px',
-    fontWeight: '700',
-    color: '#4c51bf',
-    marginBottom: '16px',
-    gap: '8px'
-  },
-  balance: {
-    textAlign: 'center',
-    fontSize: '32px',
-    color: '#38a169',
-    fontWeight: '600',
-    marginBottom: '24px'
-  },
-  filterGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-    gap: '16px',
-    marginBottom: '24px'
-  },
-  label: {
-    display: 'flex',
-    flexDirection: 'column',
-    fontSize: '14px',
-    color: '#2d3748'
-  },
-  input: {
-    border: '1px solid #ccc',
-    padding: '8px',
-    borderRadius: '6px',
-    fontSize: '14px',
-    marginTop: '4px'
-  },
-  select: {
-    border: '1px solid #ccc',
-    padding: '8px',
-    borderRadius: '6px',
-    fontSize: '14px',
-    marginTop: '4px'
-  },
- subheading: {
-  display: 'flex',
-  alignItems: 'center',
-  fontSize: '20px',
-  fontWeight: '600',
-  marginBottom: '12px',
-  gap: '8px',
-  color: '#2d3748'
-},
-
-  message: {
-    fontSize: '14px',
-    color: '#4a5568'
-  }
-};
-
 const TransactionHistory = () => {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
@@ -120,49 +55,56 @@ const TransactionHistory = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}><CiBank /> Bank Balance</h2>
-      <h1 style={styles.balance}>₹ {balance}</h1>
+    <div className="max-w-3xl mx-auto p-6 font-sans">
+      <h2 className="flex items-center text-2xl font-bold text-indigo-600 mb-4 gap-2">
+        <CiBank /> Bank Balance
+      </h2>
+      <h1 className="text-center text-4xl font-semibold text-green-600 mb-6">
+        ₹ {balance}
+      </h1>
 
-      <div style={styles.filterGrid}>
-        <label style={styles.label}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <label className="flex flex-col text-sm text-gray-700">
           Date
           <input
             type="date"
             name="date"
             onChange={handleFilterChange}
-            style={styles.input}
+            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             value={filters.date}
           />
         </label>
-        <label style={styles.label}>
+
+        <label className="flex flex-col text-sm text-gray-700">
           Year
           <input
             type="number"
             name="year"
             placeholder="e.g., 2025"
             onChange={handleFilterChange}
-            style={styles.input}
+            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             value={filters.year}
           />
         </label>
-        <label style={styles.label}>
+
+        <label className="flex flex-col text-sm text-gray-700">
           Month
           <input
             type="number"
             name="month"
             placeholder="1-12"
             onChange={handleFilterChange}
-            style={styles.input}
+            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             value={filters.month}
           />
         </label>
-        <label style={styles.label}>
+
+        <label className="flex flex-col text-sm text-gray-700">
           Type
           <select
             name="type"
             onChange={handleFilterChange}
-            style={styles.select}
+            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             value={filters.type}
           >
             <option value="">All Types</option>
@@ -170,12 +112,13 @@ const TransactionHistory = () => {
             <option value="expense">Expense</option>
           </select>
         </label>
-        <label style={styles.label}>
+
+        <label className="flex flex-col text-sm text-gray-700">
           Category
           <select
             name="category"
             onChange={handleFilterChange}
-            style={styles.select}
+            className="mt-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             value={filters.category}
           >
             <option value="">All Categories</option>
@@ -192,11 +135,14 @@ const TransactionHistory = () => {
         </label>
       </div>
 
-      <h3 style={styles.subheading}><GrTransaction /> Transaction History</h3>
+      <h3 className="flex items-center text-xl font-semibold mb-3 gap-2 text-gray-800">
+        <GrTransaction /> Transaction History
+      </h3>
+
       {loading ? (
-        <p style={styles.message}>Loading transactions...</p>
+        <p className="text-gray-600 text-sm">Loading transactions...</p>
       ) : transactions.length === 0 ? (
-        <p style={styles.message}>No transactions found for selected filters.</p>
+        <p className="text-gray-600 text-sm">No transactions found for selected filters.</p>
       ) : (
         transactions.map(txn => (
           <TransactionItem key={txn._id} txn={txn} />

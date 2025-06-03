@@ -58,57 +58,26 @@ const Insights = () => {
   }, [days, userId]);
 
   if (!userId) {
-    return <p style={{ textAlign: 'center', marginTop: '50px' }}>Please login to view insights.</p>;
+    return <p className="text-center mt-12 text-lg text-gray-600">Please login to view insights.</p>;
   }
 
   return (
-    <div style={{
-      maxWidth: '1100px',
-      margin: '40px auto',
-      padding: '30px',
-      borderRadius: '16px',
-      background: 'linear-gradient(to right, #fdfbfb, #ebedee)',
-      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-      fontFamily: 'Segoe UI, sans-serif'
-    }}>
-      <h2 style={{
-        textAlign: 'center',
-        fontSize: '28px',
-        marginBottom: '30px',
-        color: '#2c3e50',
-        fontWeight: '600'
-      }}>
-        📊 Spending Insights
-      </h2>
+    <div className="max-w-6xl mx-auto mt-10 p-8 rounded-xl bg-gradient-to-r from-white to-gray-100 shadow-lg font-sans">
+      <h2 className="text-center text-2xl font-semibold text-gray-800 mb-8">📊 Spending Insights</h2>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: '25px',
-        fontSize: '16px',
-        color: '#333'
-      }}>
-        <label style={{ fontWeight: '500', marginRight: '10px' }}>Show data for last</label>
+      <div className="flex items-center justify-center mb-6 text-gray-700 text-base">
+        <label className="font-medium mr-2">Show data for last</label>
         <input
           type="number"
           value={days}
           min="1"
           onChange={(e) => setDays(Number(e.target.value))}
-          style={{
-            width: '80px',
-            padding: '8px 12px',
-            borderRadius: '8px',
-            border: '1px solid #ccc',
-            fontSize: '15px',
-            outline: 'none',
-            marginRight: '6px'
-          }}
+          className="w-20 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 mr-2"
         />
-        <span style={{ fontWeight: '500' }}>days</span>
+        <span className="font-medium">days</span>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '50px' }}>
+      <div className="flex justify-center mb-12 overflow-x-auto">
         <PieChart width={500} height={350}>
           <Pie
             data={categoryData}
@@ -130,9 +99,7 @@ const Insights = () => {
       </div>
 
       <div>
-        <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#2c3e50' }}>
-          💸 Category Limit vs Spending
-        </h3>
+        <h3 className="text-center mb-6 text-lg font-semibold text-gray-800">💸 Category Limit vs Spending</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={limitsData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -146,7 +113,7 @@ const Insights = () => {
         </ResponsiveContainer>
       </div>
 
-      <div style={{ marginTop: '50px', padding: '20px', borderTop: '1px solid #ccc' }}>
+      <div className="mt-12 pt-6 border-t border-gray-300">
         <LimitManager
           limitsData={limitsData}
           setLimitsData={setLimitsData}
