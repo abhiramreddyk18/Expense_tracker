@@ -1,141 +1,116 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const SendMoneyForm = ({ senderId, receiver }) => {
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
-  const navigate = useNavigate();
+const SearchUser = ({ onUserSelect }) => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const backendUrl = 'http://localhost:3000';
+  const [hoveredId, setHoveredId] = useState(null);
 
-  const handleSend = async () => {
-    if (!amount || !category) {
-      return alert("Please enter all details");
-    }
+  useEffect(() => {
+    fetchUserPayments();
+  }, []);
 
-    console.log("receiver ---> " + JSON.stringify(receiver));
-    console.log("senderId:" + senderId);
-    console.log("recevierId:" + receiver._id);
-
-    navigate('/confirm-pin', {
-      state: {
-        senderId,
-        receiverId: receiver._id,
-        receiverEmail: receiver.email,
-        amount,
-        category,
-        description,
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (query && query.length > 1) {
+        searchUsers();
+      } else {
+        setResults([]);
       }
-    });
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
+
+  const searchUsers = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/user/searchuser?phoneNumber=${query}`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setResults(data.users);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setResults([]);
+    }
+  };
+
+  const fetchUserPayments = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const res = await axios.get(`${backendUrl}/payment/user-payments/${userId}`);
+      setPayments(res.data.payments);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <button onClick={() => navigate(-1)} style={styles.backButton}>
-        ← Back
-      </button>
-
-      <h3 style={styles.heading}>
-        Send Money to <span style={styles.highlight}>{receiver?.name || 'Recipient'}</span>
-      </h3>
-
-      <input
-        type="number"
-        placeholder="Amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        style={styles.input}
-      />
-
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        style={styles.select}
-      >
-        <option value="">--Select Category--</option>
-        <option value="Food">Food</option>
-        <option value="Bills">Bills</option>
-        <option value="Shopping">Shopping</option>
-        <option value="Travel">Travel</option>
-        <option value="Education">Education</option>
-        <option value="Health">Health</option>
-        <option value="Salary">Salary</option>
-        <option value="Other">Other</option>
-      </select>
-
+    <div className="max-w-xl mx-auto p-5 font-sans">
+      <h2 className="text-2xl mb-3 font-semibold">Search by Phone Number</h2>
       <input
         type="text"
-        placeholder="Description (optional)"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        style={styles.input}
+        placeholder="Enter phone number"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="w-full p-3 mb-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
       />
 
-      <button
-        onClick={handleSend}
-        style={styles.sendButton}
-        onMouseOver={(e) => (e.target.style.backgroundColor = '#218838')}
-        onMouseOut={(e) => (e.target.style.backgroundColor = '#28a745')}
-      >
-        Send Money
-      </button>
+      {query.length <= 1 && payments.length > 0 && (
+        <div>
+          <h3 className="text-lg font-bold mt-5 mb-2">Recent Payments</h3>
+          {payments.map((payment) => (
+            <div
+              key={payment._id}
+              className="flex justify-between items-center bg-white p-4 mb-3 rounded-lg shadow cursor-default"
+            >
+              <div className="flex flex-col">
+                <span className="font-semibold text-base">{payment.otherUserName}</span>
+                <span className="text-sm text-gray-500">{payment.otherUserPhone}</span>
+              </div>
+              <div
+                className={`font-bold text-base min-w-[70px] text-right ${
+                  payment.type === 'received' ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
+                ₹{payment.amount}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <div>
+          <h3 className="text-lg font-bold mt-5 mb-2">Search Results</h3>
+          {results.map((user) => (
+            <div
+              key={user._id}
+              onClick={() => onUserSelect(user)}
+              onMouseEnter={() => setHoveredId(user._id)}
+              onMouseLeave={() => setHoveredId(null)}
+              className={`
+                flex justify-between items-center bg-white p-5 mb-3 rounded-lg shadow cursor-pointer
+                transition-transform duration-200
+                ${hoveredId === user._id ? 'scale-105 shadow-lg' : ''}
+              `}
+            >
+              <div className="flex flex-col">
+                <span className="font-semibold text-base">{user.name}</span>
+                <span className="text-sm text-gray-500">{user.phoneNumber}</span>
+              </div>
+              <div className="font-medium text-gray-700">View</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {results.length === 0 && query.length > 1 && (
+        <p className="text-center text-gray-500 mt-5">No users found</p>
+      )}
     </div>
   );
 };
 
-// CSS styles as a JS object
-const styles = {
-  container: {
-    maxWidth: '400px',
-    margin: '40px auto',
-    padding: '30px',
-    borderRadius: '15px',
-    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
-    background: '#ffffff',
-    fontFamily: 'Arial, sans-serif',
-  },
-  backButton: {
-    background: 'transparent',
-    border: 'none',
-    color: '#007bff',
-    cursor: 'pointer',
-    fontSize: '16px',
-    marginBottom: '20px',
-  },
-  heading: {
-    marginBottom: '25px',
-    color: '#333',
-  },
-  highlight: {
-    color: '#007bff',
-  },
-  input: {
-    width: '100%',
-    padding: '12px',
-    marginBottom: '15px',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-    fontSize: '16px',
-  },
-  select: {
-    width: '100%',
-    padding: '12px',
-    marginBottom: '15px',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-    fontSize: '16px',
-    backgroundColor: '#fff',
-  },
-  sendButton: {
-    width: '100%',
-    padding: '14px',
-    backgroundColor: '#28a745',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '16px',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-  }
-};
-
-export default SendMoneyForm;
+export default SearchUser;
