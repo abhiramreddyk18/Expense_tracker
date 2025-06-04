@@ -142,51 +142,64 @@ exports.getSummaryForLastNDays = async (req, res) => {
 };
 
 
-
 exports.getcategorySum = async (req, res) => {
   try {
     const { userId } = req.params;
-    const n = parseInt(req.query.days, 10);
+    const days = parseInt(req.query.days, 10);
 
-    const endDate = new Date(); // Today
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid userId' });
+    }
+
+    if (isNaN(days) || days <= 0) {
+      return res.status(400).json({ error: 'Invalid number of days' });
+    }
+
+    const endDate = new Date();
     const startDate = new Date();
-    startDate.setDate(endDate.getDate() - n); // Subtract 'n' days
+    startDate.setDate(endDate.getDate() - days);
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select('bankdetails');
+    if (!user || !user.bankdetails) {
+      return res.status(404).json({ error: 'User or bank details not found' });
+    }
+
     const userbank = await UserBank.findById(user.bankdetails);
+    if (!userbank) {
+      return res.status(404).json({ error: 'User bank not found' });
+    }
 
+   
     const summary = await Transaction.aggregate([
       {
         $match: {
           userId: new mongoose.Types.ObjectId(userbank._id),
-          date: { $gte: startDate, $lte: endDate } // Filter for transactions in the last 'n' days
+          date: { $gte: startDate, $lte: endDate },
         },
       },
       {
         $group: {
-          _id: { category: "$category", type: "$type" },  // Group by category and type
-          totalAmount: { $sum: "$amount" }
+          _id: "$category",   
+          totalAmount: { $sum: "$amount" },
         },
       },
       {
-        $sort: { "_id.category": 1, "_id.type": 1 } // Sort by category and then type
-      }
+        $sort: { "_id": 1 }, 
+      },
     ]);
 
   
     const formattedSummary = summary.map(item => ({
-      category: item._id.category,
-      type: item._id.type,
-      totalAmount: item.totalAmount
+      category: item._id,
+      totalAmount: item.totalAmount,
     }));
 
-    res.json(formattedSummary);
+    return res.json(formattedSummary);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch category summary." });
+    console.error('Error fetching category sum:', err);
+    return res.status(500).json({ error: "Failed to fetch category summary." });
   }
 };
-
 
 
 

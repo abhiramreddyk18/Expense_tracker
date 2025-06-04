@@ -58,7 +58,7 @@ const Insights = () => {
     return <p className="text-center mt-12 text-lg text-gray-600">Please login to view insights.</p>;
   }
 
-  // Corrected maxExpenseCategory initialization with default spent=0
+
   const maxExpenseCategory = limitsData.length > 0
     ? limitsData.reduce((max, item) =>
         item.spent > (max.spent || 0) ? item : max, { spent: 0 })
