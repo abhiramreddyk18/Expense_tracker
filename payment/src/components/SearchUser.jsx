@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const SearchUser = ({ onUserSelect }) => {
+const SearchUser = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [payments, setPayments] = useState([]);
   const backendUrl = 'http://localhost:3000';
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserPayments();
@@ -35,6 +37,11 @@ const SearchUser = ({ onUserSelect }) => {
     }
   };
 
+  const goToChat = (receiverObj) => {
+    
+    navigate('/chat', { state: { receiver: receiverObj } });
+  };
+
   const fetchUserPayments = async () => {
     try {
       const userId = localStorage.getItem('userId');
@@ -45,100 +52,40 @@ const SearchUser = ({ onUserSelect }) => {
     }
   };
 
-  const styles = {
-    container: {
-      maxWidth: '600px',
-      margin: '0 auto',
-      padding: '20px',
-      fontFamily: 'Arial, sans-serif',
-    },
-    heading: {
-      fontSize: '24px',
-      marginBottom: '10px',
-    },
-    input: {
-      width: '100%',
-      padding: '10px',
-      fontSize: '16px',
-      borderRadius: '6px',
-      border: '1px solid #ccc',
-      marginBottom: '20px',
-    },
-    card: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      background: '#fff',
-      padding: '15px 20px',
-      margin: '10px 0',
-      borderRadius: '10px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-      cursor: 'pointer',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-    },
-    cardHover: {
-      transform: 'scale(1.01)',
-      boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-    },
-    leftContent: {
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    name: {
-      fontWeight: 'bold',
-      fontSize: '16px',
-      marginBottom: '4px',
-    },
-    phone: {
-      color: '#888',
-      fontSize: '13px',
-    },
-    money: {
-      fontWeight: 'bold',
-      fontSize: '16px',
-      minWidth: '70px',
-      textAlign: 'right',
-    },
-    amountPositive: {
-      color: 'green',
-    },
-    amountNegative: {
-      color: 'red',
-    },
-    noResults: {
-      textAlign: 'center',
-      color: '#888',
-      marginTop: '20px',
-    },
-  };
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Search by Phone Number</h2>
+    <div className="max-w-xl mx-auto p-5 font-sans">
+      <h2 className="text-2xl mb-2 font-semibold">Search by Phone Number</h2>
       <input
         type="text"
         placeholder="Enter phone number"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        style={styles.input}
+        className="w-full p-2 text-base rounded-md border border-gray-300 mb-5"
       />
 
       {query?.length <= 1 && payments?.length > 0 && (
         <div>
-          <h3 style={{ ...styles.name, marginTop: '20px' }}>Recent Payments</h3>
+          <h3 className="font-bold text-lg mt-5 mb-3">Recent Payments</h3>
           {payments.map((payment) => (
-            <div key={payment._id} style={styles.card}>
-              <div style={styles.leftContent}>
-                <div style={styles.name}>{payment.otherUserName}</div>
-                <div style={styles.phone}>{payment.otherUserPhone}</div>
+            <div
+              key={payment._id}
+              onClick={() => goToChat(payment)}
+              onMouseEnter={() => setHoveredCard(payment._id)}
+              onMouseLeave={() => setHoveredCard(null)}
+              className={`flex justify-between items-center bg-white p-4 my-2 rounded-lg shadow transition-transform duration-200 cursor-pointer ${
+                hoveredCard === payment._id ? 'scale-[1.01] shadow-lg' : 'shadow-sm'
+              }`}
+            >
+              <div className="flex flex-col">
+                <div className="font-bold text-base mb-1">{payment.otherUserName}</div>
+                <div className="text-gray-500 text-xs">{payment.otherUserPhone}</div>
               </div>
               <div
-                style={{
-                  ...styles.money,
-                  ...(payment.type === 'received'
-                    ? styles.amountPositive
-                    : styles.amountNegative),
-                }}
+                className={`font-bold text-base min-w-[70px] text-right ${
+                  payment.type === 'received' ? 'text-green-600' : 'text-red-600'
+                }`}
               >
                 ₹{payment.amount}
               </div>
@@ -149,33 +96,29 @@ const SearchUser = ({ onUserSelect }) => {
 
       {results?.length > 0 && (
         <div>
-          <h3 style={{ ...styles.name, marginTop: '20px' }}>Search Results</h3>
+          <h3 className="font-bold text-lg mt-5 mb-3">Search Results</h3>
           {results.map((user) => (
             <div
               key={user._id}
-              style={styles.card}
-              onClick={() => onUserSelect(user)}
-              onMouseEnter={(e) =>
-                Object.assign(e.currentTarget.style, styles.cardHover)
-              }
-              onMouseLeave={(e) =>
-                Object.assign(e.currentTarget.style, styles.card)
-              }
+              onClick={() => goToChat(user)}
+              onMouseEnter={() => setHoveredCard(user._id)}
+              onMouseLeave={() => setHoveredCard(null)}
+              className={`flex justify-between items-center bg-white p-4 my-2 rounded-lg shadow transition-transform duration-200 cursor-pointer ${
+                hoveredCard === user._id ? 'scale-[1.01] shadow-lg' : 'shadow-sm'
+              }`}
             >
-              <div style={styles.leftContent}>
-                <div style={styles.name}>{user.name}</div>
-                <div style={styles.phone}>{user.phoneNumber}</div>
+              <div className="flex flex-col">
+                <div className="font-bold text-base mb-1">{user.name}</div>
+                <div className="text-gray-500 text-xs">{user.phoneNumber}</div>
               </div>
-              <div style={{ ...styles.money, color: '#444', fontWeight: 500 }}>
-                View
-              </div>
+              <div className="font-semibold text-base text-gray-700">View</div>
             </div>
           ))}
         </div>
       )}
 
       {results?.length === 0 && query?.length > 1 && (
-        <p style={styles.noResults}>No users found</p>
+        <p className="text-center text-gray-500 mt-5">No users found</p>
       )}
     </div>
   );

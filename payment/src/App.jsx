@@ -16,6 +16,9 @@ import PrivateRoute from './PrivateRoute';
 
 
 import { Navigate } from 'react-router-dom';
+import ChatWithUser from './components/ChatWithUser';
+
+
 
 
 
@@ -40,6 +43,9 @@ function App() {
           <Route path="/profile" element={<ProfilePage/>}></Route>
              <Route path="/resetpin" element={<ResetPin/>}></Route>
            <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>}/>
+           <Route path="/chat" element={<ChatWithUser />} />
+
+  
 
         <Route path="*" element={<Navigate to="/home" />} />
         </Routes>

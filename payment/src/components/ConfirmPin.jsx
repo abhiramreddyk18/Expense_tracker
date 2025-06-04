@@ -31,7 +31,7 @@ const ConfirmPin = () => {
             navigate("/setpin", {
               state: { senderId: state?.senderId },
             });
-          }, 2000); // Wait 2 seconds before navigation
+          }, 2000); 
         } else {
           setLoading(false);
         }
@@ -54,16 +54,19 @@ const ConfirmPin = () => {
   }, [state?.senderId, navigate]);
 
   const handleConfirm = async () => {
-    const toastId = toast.loading("Processing your transaction...");
-    try {
-      await axios.post(`${backendUrl}/payment/send_money`, {
-        senderId: senderbankid,
-        receiverId: state?.receiverId,
-        amount: Number(state?.amount),
-        category: state?.category,
-        description: state?.description,
-        pin
-      });
+  const toastId = toast.loading("Processing your transaction...");
+
+  try {
+
+
+    await axios.post(`${backendUrl}/payment/send_money`, {
+      senderId: senderbankid,
+      receiverId: state?.receiverId,
+      amount: Number(state?.amount),
+      category: state?.category,
+      description: state?.description,
+      pin
+    });
 
     toast.update(toastId, {
       render: "Money sent successfully",
@@ -71,14 +74,53 @@ const ConfirmPin = () => {
       isLoading: false,
       autoClose: 3000,
     });
-      setTimeout(() => {
+
+    setTimeout(() => {
+      if (state?.returnToChat) {
+        navigate("/chat", {
+          state: { receiver: state.receiver }
+        });
+      } else {
         navigate("/searchuser");
-      }, 2000);
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Transaction failed");
+      }
+    }, 2000);
+
+  } catch (err) {
+    console.error(err);
+
+    const errorMsg = err.response?.data?.message || "Transaction failed";
+
+    toast.update(toastId, {
+      render: errorMsg,
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
+
+    
+    try {
+      await axios.post(`${backendUrl}/chat/send`, {
+        senderId: state?.senderId,
+        receiverId: state?.receiverId,
+        message: `❌ Transaction failed: ${errorMsg}`,
+        type: "text",
+      });
+    } catch (chatErr) {
+      console.error("Failed to send error message to chat:", chatErr);
     }
-  };
+
+    setTimeout(() => {
+     console.log("receiver: ", state.receiver);
+      if (state?.returnToChat) {
+        navigate("/chat", {
+          state: { receiver: state.receiver }
+        });
+      } else {
+        navigate("/searchuser");
+      }
+    }, 2000);
+  }
+};
 
   if (loading) return <div style={styles.loading}>Loading...</div>;
 
