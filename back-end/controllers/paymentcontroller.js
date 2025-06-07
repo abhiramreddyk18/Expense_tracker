@@ -255,6 +255,9 @@ exports.setPin = async (req, res) => {
 }
 
 
+
+
+
 exports.recent_payments = async (req, res) => {
   const { userId } = req.params;
 
@@ -270,51 +273,41 @@ exports.recent_payments = async (req, res) => {
 
     const userBankId = user.bankdetails;
 
-    
-    const transactions = await Transaction.find({
-      $or: [
-        { userId: userBankId },
-        { relatedUser: userBankId }
-      ]
-    })
+    // Get recent 50 transactions of the user (more to filter duplicates)
+    const transactions = await Transaction.find({ userId: userBankId })
       .sort({ date: -1 })
-      .limit(5); 
+      .limit(50); // fetch more to filter to 5 unique users
 
-    const seen = new Set();
+    const seenUsers = new Set();
     const filteredPayments = [];
 
     for (const tx of transactions) {
-      const txIdPair = [tx.userId, tx.relatedUser].sort().join('-');
-      if (seen.has(txIdPair)) continue;
-      seen.add(txIdPair);
+      const otherBankId = tx.relatedUser?.toString();
 
-      const isSender = String(tx.userId) === String(userBankId);
-      const otherBankId = isSender ? tx.relatedUser : tx.userId;
+      // Skip if no related user or already added
+      if (!otherBankId || seenUsers.has(otherBankId)) continue;
 
-      let otherUserBank = null;
+      seenUsers.add(otherBankId);
 
-      if (otherBankId) {
-        otherUserBank = await UserBank.findById(otherBankId);
-      }
+      const otherUserBank = await UserBank.findById(otherBankId);
 
       filteredPayments.push({
         _id: tx._id,
         amount: tx.amount,
         category: tx.category,
-        type: isSender ? 'sent' : 'received',
+        type: tx.type, // 'income' or 'expense'
         otherUserName: otherUserBank?.name || 'Unknown',
         otherUserPhone: otherUserBank?.phoneNumber || 'N/A',
-        date: tx.date
+        date: tx.date,
       });
 
-      // Stop at 5 filtered transactions
       if (filteredPayments.length >= 5) break;
     }
 
     return res.status(200).json({ payments: filteredPayments });
 
   } catch (err) {
-    console.error('Error fetching transactions:', err);
+    console.error('Error fetching recent payments:', err);
     return res.status(500).json({ error: 'Server error' });
   }
 };

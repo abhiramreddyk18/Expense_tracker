@@ -26,7 +26,7 @@ function App() {
 
 
   return (
-    <div className="App">
+    <div className="App  bg-indigo-100">
      
       <BrowserRouter>
        <Header/>

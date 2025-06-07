@@ -1,25 +1,23 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const LimitManager = ({ limitsData, setLimitsData, userId, backendUrl, availableCategories }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [limitAmount, setLimitAmount] = useState('');
 
-
   const handleDeleteLimit = async (categoryToDelete) => {
-  const confirmDelete = window.confirm(`Are you sure you want to delete the limit for "${categoryToDelete}"?`);
-  if (!confirmDelete) return;
+    const confirmDelete = window.confirm(`Are you sure you want to delete the limit for "${categoryToDelete}"?`);
+    if (!confirmDelete) return;
 
-  try {
-    await axios.delete(`${backendUrl}/bank/category-limits/${userId}/${categoryToDelete}`);
-    setLimitsData(prev => prev.filter(item => item.category !== categoryToDelete));
-    alert('Limit deleted successfully!');
-  } catch (error) {
-    console.error('Error deleting limit:', error);
-    alert('Failed to delete limit');
-  }
-};
-
+    try {
+      await axios.delete(`${backendUrl}/bank/category-limits/${userId}/${categoryToDelete}`);
+      setLimitsData(prev => prev.filter(item => item.category !== categoryToDelete));
+      alert('Limit deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting limit:', error);
+      alert('Failed to delete limit');
+    }
+  };
 
   const handleAddLimit = async () => {
     if (!selectedCategory) {
@@ -58,45 +56,17 @@ const LimitManager = ({ limitsData, setLimitsData, userId, backendUrl, available
   };
 
   return (
-    <div style={{
-      maxWidth: 600,
-      margin: '40px auto',
-      backgroundColor: '#fff',
-      borderRadius: 12,
-      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-      padding: '30px',
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      color: '#333',
-      userSelect: 'none'
-    }}>
-      <h3 style={{
-        marginBottom: 24,
-        fontWeight: '700',
-        fontSize: '1.8rem',
-        color: '#2c3e50',
-        textAlign: 'center',
-        letterSpacing: '0.03em',
-      }}>
+    <div className="max-w-xl mx-auto mt-10 bg-netural-800 rounded-xl shadow-lg p-8 font-sans text-white select-none">
+      <h3 className="text-2xl font-bold text-center mb-6 text-white tracking-wide">
         Set New Category Limit
       </h3>
 
-      <div style={{ display: 'flex', gap: 16, marginBottom: 30 }}>
+      <div className="flex gap-4 mb-8">
         <select
           value={selectedCategory}
           onChange={e => setSelectedCategory(e.target.value)}
-          style={{
-            flex: 2,
-            padding: '12px 16px',
-            borderRadius: 10,
-            border: '1.8px solid #ccc',
-            fontSize: 16,
-            transition: 'border-color 0.3s',
-            outline: 'none',
-            cursor: 'pointer',
-            backgroundColor: '#f9f9f9',
-          }}
-          onFocus={e => e.target.style.borderColor = '#3f51b5'}
-          onBlur={e => e.target.style.borderColor = '#ccc'}
+          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 text-base font-normal focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-pointer"
+          aria-label="Select category"
         >
           <option value="" disabled>-- Select Category --</option>
           {availableCategories.map(cat => (
@@ -109,109 +79,46 @@ const LimitManager = ({ limitsData, setLimitsData, userId, backendUrl, available
           placeholder="Limit amount (₹)"
           value={limitAmount}
           onChange={e => setLimitAmount(e.target.value)}
-          style={{
-            flex: 2,
-            padding: '12px 16px',
-            borderRadius: 10,
-            border: '1.8px solid #ccc',
-            fontSize: 16,
-            outline: 'none',
-            transition: 'border-color 0.3s',
-            backgroundColor: '#f9f9f9',
-          }}
+          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 text-base font-normal focus:outline-none focus:ring-2 focus:ring-blue-300"
           min="0"
-          onFocus={e => e.target.style.borderColor = '#3f51b5'}
-          onBlur={e => e.target.style.borderColor = '#ccc'}
+          aria-label="Limit amount"
         />
 
         <button
           onClick={handleAddLimit}
-          style={{
-            flex: 1,
-            backgroundColor: '#3f51b5',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 10,
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: 16,
-            boxShadow: '0 4px 15px rgba(63, 81, 181, 0.4)',
-            transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
-            userSelect: 'none',
-          }}
-          onMouseEnter={e => {
-            e.target.style.backgroundColor = '#303f9f';
-            e.target.style.boxShadow = '0 6px 20px rgba(48, 63, 159, 0.6)';
-          }}
-          onMouseLeave={e => {
-            e.target.style.backgroundColor = '#3f51b5';
-            e.target.style.boxShadow = '0 4px 15px rgba(63, 81, 181, 0.4)';
-          }}
+          className="flex-none px-6 py-2 rounded-lg  text-lime-600  hover:text-black font-semibold shadow-md hover:bg-blue-300 hover:shadow-lg transition duration-300 select-none"
           aria-label="Save category limit"
         >
           Save
         </button>
       </div>
 
-      <h3 style={{
-        fontWeight: '700',
-        fontSize: '1.6rem',
-        color: '#2c3e50',
-        marginBottom: 20,
-        borderBottom: '2px solid #3f51b5',
-        paddingBottom: 8,
-        userSelect: 'text',
-      }}>
+      <h3 className="text-xl font-semibold text-white mb-4 border-b-2 border-blue-300 pb-2 select-text">
         Current Limits
       </h3>
 
       {limitsData.length === 0 ? (
-        <p style={{
-          fontSize: 16,
-          color: '#666',
-          textAlign: 'center',
-          fontStyle: 'italic',
-          userSelect: 'text',
-        }}>
-          No limits set yet.
-        </p>
+        <p className="text-center italic text-white select-text">No limits set yet.</p>
       ) : (
         limitsData.map(({ category, limit }, idx) => (
-  <div
-    key={idx}
-    style={{
-      padding: '14px 18px',
-      marginBottom: 12,
-      borderRadius: 8,
-      backgroundColor: '#f5f6fa',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      fontSize: 16,
-      fontWeight: '500',
-      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)'
-    }}
-  >
-    <span>{category}</span>
-    <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <span style={{ color: '#3f51b5', fontWeight: '700' }}>₹{limit.toFixed(2)}</span>
-      <button
-        onClick={() => handleDeleteLimit(category)}
-        style={{
-          background: 'transparent',
-          border: 'none',
-          color: '#e53935',
-          cursor: 'pointer',
-          fontSize: 18,
-          fontWeight: 'bold',
-        }}
-        title="Delete Limit"
-      >
-        ❌
-      </button>
-    </span>
-  </div>
-))
+          <div
+            key={idx}
+            className="flex justify-between items-center p-4 mb-3 rounded-lg bg-netrual-800 shadow-inner font-medium text-white select-text"
+          >
+            <span>{category}</span>
+            <div className="flex items-center gap-4">
+              <span>₹{limit}</span>
+              <button
+                onClick={() => handleDeleteLimit(category)}
+                className="text-red-500 hover:text-red-700 transition duration-200 font-semibold cursor-pointer select-none"
+                aria-label={`Delete limit for ${category}`}
+                title={`Delete limit for ${category}`}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

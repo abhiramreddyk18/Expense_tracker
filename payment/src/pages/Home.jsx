@@ -28,7 +28,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen  bg-indigo-100   from-blue-50 via-indigo-50 to-purple-50 font-sans">
+    <div className="min-h-screen  bg-indigo-100 ">
       {/* Hero Section */}
       <section className="flex flex-col lg:flex-row py-5 rounded-lg overflow-hidden mb-8 max-w-7xl mx-auto">
         {/* Left Side: Balance & Button */}

@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { logout } from '../auth';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
-  const [Income,setIncome]=useState(null);
-  const [Expense,setExpense]=useState(null);
-  const [Savings,setSavings]=useState(null);
+  const [Income, setIncome] = useState(null);
+  const [Expense, setExpense] = useState(null);
+  const [Savings, setSavings] = useState(null);
 
-
-const navigate = useNavigate();;
+  const navigate = useNavigate();
 
   const backendUrl = 'http://localhost:3000';
-  
+
   const userId = localStorage.getItem("userId");
 
-
   const handleLogout = () => {
-    logout();            
-    navigate('/login');   
+    logout();
+    navigate('/login');
   };
 
   useEffect(() => {
@@ -32,141 +30,106 @@ const navigate = useNavigate();;
       }
     };
 
+    fetchUser();
 
-     fetchUser();
+    const fetchTransactionSummary = async () => {
+      try {
+        let n = 30;
+        const res = await axios.get(`${backendUrl}/bank/summary/${userId}?days=${n}`);
 
+        console.log(res.data);
 
-     const fetchTransactionSummary = async () => {
-    try {
-      let n=30;
-      const res = await axios.get(`${backendUrl}/bank/summary/${userId}?days=${n}`);
-      
-      console.log(res.data);
-      
-      setIncome( res.data.income);
-      setExpense(res.data.expense);
-      setSavings(res.data.savings);
-    
-    } catch (err) {
-      console.error("Error fetching summary", err);
-    }
-  };
+        setIncome(res.data.income);
+        setExpense(res.data.expense);
+        setSavings(res.data.savings);
 
- 
-  fetchTransactionSummary();
-},[]);
+      } catch (err) {
+        console.error("Error fetching summary", err);
+      }
+    };
 
-  if (user==null) return <p>Loading...</p>;
+    fetchTransactionSummary();
+  }, [backendUrl, userId]);
 
-  const containerStyle = {
-    maxWidth: '800px',
-    margin: '40px auto',
-    padding: '30px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '16px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-    fontFamily: 'Segoe UI, sans-serif',
-    color: '#333'
-  };
-
-  const headerStyle = {
-    fontSize: '28px',
-    fontWeight: 'bold',
-    marginBottom: '20px',
-    borderBottom: '2px solid #ccc',
-    paddingBottom: '10px',
-    textAlign: 'center'
-  };
-
-  const labelStyle = {
-    fontWeight: '600',
-    marginBottom: '6px',
-    color: '#444'
-  };
-
-  const valueStyle = {
-    marginBottom: '16px',
-    fontSize: '17px'
-  };
-
-  const sectionStyle = {
-    marginTop: '30px'
-  };
-
-  const buttonStyle = {
-    marginRight: '15px',
-    padding: '10px 18px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: '600',
-    transition: '0.3s ease'
-  };
-
-  const cardGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '20px',
-    marginTop: '20px'
-  };
-
-  const cardStyle = {
-    padding: '20px',
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    textAlign: 'center'
-  };
+  if (user == null) return <p className="text-center mt-10 text-gray-600">Loading...</p>;
 
   return (
-    <div style={containerStyle}>
-      <div style={headerStyle}>👤 Profile</div>
-
-      <div>
-        <div style={labelStyle}>Name:</div>
-        <div style={valueStyle}>{user.name}</div>
-
-        <div style={labelStyle}>Email:</div>
-        <div style={valueStyle}>{user.email}</div>
-
-        <div style={labelStyle}>Phone:</div>
-        <div style={valueStyle}>{user.phoneNumber || "Not provided"}</div>
-
-        <div style={labelStyle}>Account Number:</div>
-        <div style={valueStyle}>
-          **** **** {user.accountNumber?.slice(-4) || "XXXX"}
-        </div>
-
-        <div style={labelStyle}>💰 Balance:</div>
-        <div style={{ ...valueStyle, fontSize: '20px', color: 'green' }}>₹ {user.balance}</div>
+    <div className="max-w-3xl mx-auto mt-10 p-8 bg-gray-50 rounded-xl shadow-lg font-sans text-gray-800 select-none">
+      <div className="text-center text-3xl font-bold mb-8 border-b-2 border-gray-300 pb-4">
+        👤 Profile
       </div>
 
-      <div style={sectionStyle}>
-        <h3 style={{ marginBottom: '10px' }}>📊 Insights</h3>
-       
-        <div style={cardGridStyle}>
-          <div style={cardStyle}>
-            <strong>Total Income</strong>
-            <p>₹ {Income || 0}</p>
-          </div>
-          <div style={cardStyle}>
-            <strong>Total Expense</strong>
-            <p style={{ color: 'red' }}>₹ {Expense || 0}</p>
-          </div>
-          <div style={cardStyle}>
-            <strong>Monthly Savings</strong>
-            <p>₹ {(Savings|| 0)}</p>
-          </div>
+      <div className="space-y-4">
+        <div>
+          <div className="font-semibold text-gray-700 mb-1">Name:</div>
+          <div className="text-lg">{user.name}</div>
+        </div>
+
+        <div>
+          <div className="font-semibold text-gray-700 mb-1">Email:</div>
+          <div className="text-lg">{user.email}</div>
+        </div>
+
+        <div>
+          <div className="font-semibold text-gray-700 mb-1">Phone:</div>
+          <div className="text-lg">{user.phoneNumber || "Not provided"}</div>
+        </div>
+
+        <div>
+          <div className="font-semibold text-gray-700 mb-1">Account Number:</div>
+          <div className="text-lg">**** **** {user.accountNumber?.slice(-4) || "XXXX"}</div>
+        </div>
+
+        <div>
+          <div className="font-semibold text-gray-700 mb-1">💰 Balance:</div>
+          <div className="text-xl font-bold text-green-600">₹ {user.balance}</div>
         </div>
       </div>
 
-      <div style={sectionStyle}>
-        <h3 style={{ marginBottom: '10px' }}>⚙️ Actions</h3>
-        <button style={buttonStyle}>Edit Profile</button>
-        <button style={{ ...buttonStyle, backgroundColor: '#28a745' }} onClick={()=>{navigate('/resetpin')}}>Reset PIN</button>
-        <button style={{ ...buttonStyle, backgroundColor: '#dc3545' }} onClick={handleLogout}>Logout</button>
+      <div className="mt-10">
+        <h3 className="text-2xl font-semibold mb-6 border-b border-blue-400 pb-2 select-text">📊 Insights</h3>
+
+        <div className="grid grid-cols-3 gap-6">
+          <div className="p-6 bg-indigo-100 rounded-lg shadow text-center">
+            <strong className="block mb-2">Total Income</strong>
+            <p className="text-lg">₹ {Income || 0}</p>
+          </div>
+          <div className="p-6 bg-indigo-100 rounded-lg shadow text-center">
+            <strong className="block mb-2">Total Expense</strong>
+            <p className="text-lg text-red-600">₹ {Expense || 0}</p>
+          </div>
+          <div className="p-6 bg-indigo-100 rounded-lg shadow text-center">
+            <strong className="block mb-2">Monthly Savings</strong>
+            <p className="text-lg">₹ {Savings || 0}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <h3 className="text-2xl font-semibold mb-4 border-b border-blue-400 pb-2">⚙️ Actions</h3>
+
+        <div className="flex gap-4 flex-wrap">
+          <button
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-300 select-none"
+            onClick={() => alert('Edit Profile clicked!')} // You can replace this with actual edit logic
+          >
+            Edit Profile
+          </button>
+
+          <button
+            className="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition duration-300 select-none"
+            onClick={() => { navigate('/resetpin') }}
+          >
+            Reset PIN
+          </button>
+
+          <button
+            className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition duration-300 select-none"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   );

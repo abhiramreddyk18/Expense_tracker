@@ -65,8 +65,8 @@ const Insights = () => {
     : null;
 
   return (
-  <div className="w-full min-h-screen px-6 py-10 bg-gray-700">
-      <h2 className="text-4xl font-bold text-white mb-8">📊 Spending Insights</h2>
+  <div className="w-full min-h-screen px-6 py-10  bg-indigo-100   from-blue-50 via-indigo-50 to-purple-50 font-sans">
+      <h2 className="text-4xl font-bold text-black mb-8">📊 Spending Insights</h2>
 
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10 px-6 py-4 bg-neutral-800 rounded-xl shadow-lg text-white">
 
@@ -91,8 +91,8 @@ const Insights = () => {
 
       <div className="w-full flex flex-col lg:flex-row gap-8 mb-12">
 
-        <div className="w-full lg:w-1/2 p-6 rounded-xl shadow-lg bg-gray-300">
-          <h3 className="text-2xl font-semibold mb-4 text-gray-800">📈 Category-wise Income & Expenses</h3>
+        <div className="w-full lg:w-1/2 p-6 rounded-xl shadow-lg  bg-neutral-800 ">
+          <h3 className="text-2xl font-semibold mb-4 text-white">📈 Category-wise Income & Expenses</h3>
           <div className="flex justify-center">
             <PieChart width={500} height={400}>
               <Pie
@@ -115,8 +115,8 @@ const Insights = () => {
           </div>
         </div>
 
-        <div className="w-full lg:w-1/2 bg-rose-100 p-6 rounded-xl shadow-lg bg-gray-300">
-          <h3 className="text-2xl font-semibold mb-4 text-gray-800">💸 Category Limit vs Spending</h3>
+        <div className="w-full lg:w-1/2  bg-neutral-800 p-6 rounded-xl shadow-lg">
+          <h3 className="text-2xl font-semibold mb-4 text-white">💸 Category Limit vs Spending</h3>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={limitsData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -131,8 +131,8 @@ const Insights = () => {
         </div>
       </div>
 
-      <div className=" p-8 rounded-xl shadow-lg mb-1 bg-gray-300">
-        <h3 className="text-2xl font-semibold mb-5 text-gray-800">🛠️ Set Category Limits</h3>
+      <div className=" p-8 rounded-xl shadow-lg mb-1  bg-neutral-800 ">
+        <h3 className="text-2xl font-semibold mb-5 text-white">🛠️ Set Category Limits</h3>
         <LimitManager
           limitsData={limitsData}
           setLimitsData={setLimitsData}
