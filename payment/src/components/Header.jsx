@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserCircle } from 'react-icons/fa';
+import { FaUserCircle, FaBars } from 'react-icons/fa';
 import { isLoggedIn } from '../auth';
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 
 const Header = () => {
   const navigate = useNavigate();
   const userName = localStorage.getItem('name') || 'User';
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const closeDropdown = () => setShowDropdown(false);
 
   const styles = {
     header: {
@@ -34,6 +50,9 @@ const Header = () => {
       display: 'flex',
       alignItems: 'center',
     },
+    logoicon: {
+      margin: '10px'
+    },
     nav: {
       display: 'flex',
       gap: '34px',
@@ -53,19 +72,32 @@ const Header = () => {
       gap: '12px',
       fontSize: '16px',
       marginRight: '40px',
+      position: 'relative',
     },
-    logoicon: {
-      margin: '10px'
-    },
-    loginButton: {
-      background: 'none',
-      border: '1px solid white',
-      borderRadius: '4px',
-      color: 'white',
-      fontSize: '14px',
-      padding: '6px 12px',
+    hamburger: {
+      fontSize: '24px',
       cursor: 'pointer',
-      transition: 'opacity 0.2s',
+    },
+    dropdownMenu: {
+      position: 'absolute',
+      top: '48px',
+      right: '0',
+      backgroundColor: '#1d4ed8',
+      borderRadius: '4px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+      padding: '10px',
+      zIndex: 20,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px',
+    },
+    dropdownItem: {
+      background: 'none',
+      border: 'none',
+      color: 'white',
+      fontSize: '16px',
+      textAlign: 'left',
+      cursor: 'pointer',
     }
   };
 
@@ -73,17 +105,14 @@ const Header = () => {
     <header style={styles.header}>
       <div style={styles.leftSection}>
         <div style={styles.brand} onClick={() => navigate('/')}>
-  <div style={styles.logoicon}>
-    <FaMoneyBillTrendUp />
-  </div>
-  
-  <div style={{ padding: '5px'}}>
-    <div style={{ fontSize: '20px', fontWeight: 'bold' }}>PayOLog   <sub style={{ fontSize: '12px' }}>E T S</sub></div>
-    
-  </div>
-</div>
-
-        {isLoggedIn() && (
+          <div style={styles.logoicon}><FaMoneyBillTrendUp /></div>
+          <div style={{ padding: '5px' }}>
+            <div style={{ fontSize: '20px', fontWeight: 'bold' }}>
+              PayOLog <sub style={{ fontSize: '12px' }}>E T S</sub>
+            </div>
+          </div>
+        </div>
+        {!isMobile && isLoggedIn() && (
           <nav style={styles.nav}>
             <button
               onClick={() => navigate('/send-money')}
@@ -93,7 +122,6 @@ const Header = () => {
             >
               Send Money
             </button>
-
             <button
               onClick={() => navigate('/transactions')}
               style={styles.navButton}
@@ -102,20 +130,38 @@ const Header = () => {
             >
               Transactions
             </button>
-
-           
           </nav>
         )}
       </div>
 
       <div style={styles.userSection}>
-            {isLoggedIn() ? (
+        {isMobile && isLoggedIn() && (
           <>
-          
-            <FaUserCircle size={24} onClick={() => navigate('/profile')} />
+            <FaBars style={styles.hamburger} onClick={toggleDropdown} />
+            {showDropdown && (
+              <div style={styles.dropdownMenu}>
+                <button style={styles.dropdownItem} onClick={() => { navigate('/send-money'); closeDropdown(); }}>
+                  Send Money
+                </button>
+                <button style={styles.dropdownItem} onClick={() => { navigate('/transactions'); closeDropdown(); }}>
+                  Transactions
+                </button>
+                <button style={styles.dropdownItem} onClick={() => { navigate('/profile'); closeDropdown(); }}>
+                  Profile
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {isLoggedIn() && !isMobile && (
+          <>
+            <FaUserCircle size={24} onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} />
             <span>{userName}</span>
           </>
-        ) : (
+        )}
+
+        {!isLoggedIn() && (
           <button
             onClick={() => navigate('/login')}
             style={styles.navButton}

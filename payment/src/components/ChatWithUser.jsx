@@ -19,7 +19,7 @@ const ChatWithUser = () => {
   const navigate = useNavigate();
   const receiver = location.state?.receiver;
   const receiverId = receiver?._id;
-
+console.log(receiver);
   const fetchMessages = async () => {
     if (!receiverId) return;
     try {

@@ -9,6 +9,7 @@ import { CgProfile } from "react-icons/cg";
 
 const Home = () => {
   const [balance, setBalance] = useState(0);
+  const [darkMode, setDarkMode] = useState(false);  // <-- dark mode state
   const backendUrl = 'http://localhost:3000';
 
   useEffect(() => {
@@ -27,42 +28,65 @@ const Home = () => {
     fetchUserDetails();
   }, []);
 
-  return (
-    <div className="min-h-screen  bg-indigo-100 ">
-      {/* Hero Section */}
-      <section className="flex flex-col lg:flex-row py-5 rounded-lg overflow-hidden mb-8 max-w-7xl mx-auto">
-        {/* Left Side: Balance & Button */}
-        <div className="flex-1 bg-indigo-100 p-12 flex flex-col justify-center items-center text-center space-y-8 rounded-l-lg">
-          <h2 className="text-3xl font-extrabold text-indigo-800">Welcome Back 👋</h2>
+  // Toggle handler
+  const toggleDarkMode = () => setDarkMode(!darkMode);
 
-          <div className="flex items-center gap-3 text-2xl font-semibold text-indigo-900">
-            <GiTakeMyMoney size={36} className="text-green-600" />
+  // Base classes for bg and text depending on theme
+  const bgClass = darkMode ? "bg-gray-900" : "bg-indigo-100";
+  const textPrimaryClass = darkMode ? "text-indigo-200" : "text-indigo-900";
+  const textSecondaryClass = darkMode ? "text-indigo-400" : "text-indigo-600";
+  const cardBgClass = darkMode ? "bg-gray-800" : "bg-indigo-50";
+  const footerBgClass = darkMode ? "bg-gray-800" : "bg-indigo-100";
+  const borderColor = darkMode ? "border-gray-700" : "border-indigo-300";
+
+  return (
+    <div className={`min-h-screen ${bgClass} transition-colors duration-500`}>
+      {/* Dark Mode Toggle Button */}
+      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-end">
+        <button
+          onClick={toggleDarkMode}
+          className={`px-4 py-2 rounded-md font-semibold focus:outline-none
+            ${darkMode ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-indigo-200 text-indigo-900 hover:bg-indigo-300'}`}
+        >
+          {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        </button>
+      </div>
+
+      {/* Hero Section */}
+      <section className={`flex flex-col lg:flex-row py-5 rounded-lg overflow-hidden mb-8 max-w-7xl mx-auto`}>
+        {/* Left Side: Balance & Button */}
+        <div className={`flex-1 p-12 flex flex-col justify-center items-center text-center space-y-8 rounded-l-lg ${bgClass}`}>
+          <h2 className={`text-3xl font-extrabold ${textPrimaryClass}`}>Welcome Back 👋</h2>
+
+          <div className={`flex items-center gap-3 text-2xl font-semibold ${textPrimaryClass}`}>
+            <GiTakeMyMoney size={36} className="text-green-500" />
             Current Balance:
-            <span className="text-green-700 font-bold">₹ {balance.toLocaleString()}</span>
+            <span className="text-green-400 font-bold">₹ {balance.toLocaleString()}</span>
           </div>
 
           <Link
             to="/insights"
-            className="bg-indigo-600 text-white font-semibold py-3 px-10 rounded-lg  hover:bg-indigo-700 transition"
+            className={`font-semibold py-3 px-10 rounded-lg transition 
+              ${darkMode ? 'bg-indigo-700 text-white hover:bg-indigo-600' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
           >
             View Insights
           </Link>
 
           <div className="w-full max-w-xs">
-            <h4 className="text-lg font-semibold text-indigo-700 mb-2">Monthly Spending</h4>
-            <div className="w-full bg-indigo-200 rounded-full h-5 overflow-hidden">
-              <div className="bg-indigo-600 h-full rounded-full transition-width duration-500 ease-in-out" style={{ width: '65%' }}></div>
+            <h4 className={`text-lg font-semibold mb-2 ${textPrimaryClass}`}>Monthly Spending</h4>
+            <div className={`${darkMode ? 'bg-indigo-700' : 'bg-indigo-200'} rounded-full h-5 overflow-hidden`}>
+              <div className="bg-indigo-500 h-full rounded-full transition-width duration-500 ease-in-out" style={{ width: '65%' }}></div>
             </div>
-            <p className="text-sm mt-1 text-indigo-600 font-medium">₹6,500 of ₹10,000 spent</p>
+            <p className={`text-sm mt-1 font-medium ${textSecondaryClass}`}>₹6,500 of ₹10,000 spent</p>
           </div>
 
-          <div className="italic text-sm text-indigo-500 max-w-sm px-4">
+          <div className={`italic text-sm max-w-sm px-4 ${textSecondaryClass}`}>
             "Do not save what is left after spending, but spend what is left after saving." – Warren Buffett
           </div>
         </div>
 
         {/* Right Side: Image */}
-        <div className="flex-1 p-10 flex items-center  justify-center  rounded-r-lg ">
+        <div className="flex-1 p-10 flex items-center justify-center rounded-r-lg">
           <img
             src="/images/paymentimg.png"
             alt="Payment Illustration"
@@ -72,7 +96,7 @@ const Home = () => {
       </section>
 
       {/* About Section */}
-      <section className="text-center  rounded-lg px-8 py-12 text-indigo-900 max-w-3xl mx-auto  mb-12">
+      <section className={`text-center rounded-lg px-8 py-12 max-w-3xl mx-auto mb-12 ${textPrimaryClass}`}>
         <p className="text-base font-medium leading-relaxed mb-4">
           Expense Tracking System is your personal finance assistant. It helps you track and categorize every transaction you make while sending money to others.
         </p>
@@ -82,43 +106,43 @@ const Home = () => {
       </section>
 
       {/* Features Section in Cards */}
-      <section className="grid grid-cols-1  rounded-lg sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 mb-16 ">
+      <section className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 mb-16`}>
         {[
           {
-            icon: <GiTakeMyMoney className="text-green-600" size={28} />,
+            icon: <GiTakeMyMoney className="text-green-400" size={28} />,
             text: "Track money you send or receive",
           },
           {
-            icon: <BiSolidCategory className="text-blue-500" size={28} />,
+            icon: <BiSolidCategory className="text-blue-400" size={28} />,
             text: "View categorized spending in the Insights page",
           },
           {
-            icon: <BsGraphUp className="text-purple-600" size={28} />,
+            icon: <BsGraphUp className="text-purple-400" size={28} />,
             text: "Set category-based limits and visualize progress with graphs",
           },
           {
-            icon: <GrTransaction className="text-orange-500" size={28} />,
+            icon: <GrTransaction className="text-orange-400" size={28} />,
             text: "Filter transaction history by date, month, type, or category",
           },
           {
-            icon: <CgProfile className="text-gray-700" size={28} />,
+            icon: <CgProfile className="text-gray-400" size={28} />,
             text: "View profile and detailed breakdowns of income, expenses, and savings",
           },
         ].map((feature, index) => (
           <div
             key={index}
-            className="bg-indigo-50 rounded-xl shadow-sm p-6 flex items-start gap-4 hover:shadow-lg transition-shadow"
+            className={`${cardBgClass} rounded-xl shadow-sm p-6 flex items-start gap-4 hover:shadow-lg transition-shadow`}
           >
             {feature.icon}
-            <p className="text-indigo-900 font-medium">{feature.text}</p>
+            <p className={`${textPrimaryClass} font-medium`}>{feature.text}</p>
           </div>
         ))}
       </section>
 
       {/* Footer */}
-      <footer className="text-center py-8 mt-8 border-t border-indigo-300 text-indigo-700 text-sm bg-indigo-100 max-w-7xl mx-auto rounded-lg shadow-inner">
+      <footer className={`text-center py-8 mt-8 border-t ${borderColor} text-sm max-w-7xl mx-auto rounded-lg shadow-inner ${footerBgClass} ${textSecondaryClass}`}>
         <p>© {new Date().getFullYear()} Expense Tracking System. Built with 💙 to help you manage your money smarter.</p>
-        <p className="mt-2">Designed & Developed by <span className="font-semibold text-indigo-700">YourName</span></p>
+        <p className="mt-2">Designed & Developed by <span className="font-semibold">YourName</span></p>
         <p className="mt-1">Contact: support@expensetracker.com | Version 1.0.0</p>
       </footer>
     </div>

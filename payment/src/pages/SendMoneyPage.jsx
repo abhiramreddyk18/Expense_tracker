@@ -11,7 +11,8 @@ const SendMoneyPage = () => {
   };
 
   return (
-    <div className="send-money-container">
+    <div className=" min-h-screen w-full flex flex-col items-center py-100">
+     
       <SearchUser loggedInUserId={senderId} onUserSelect={handleUserSelect} />
     </div>
   );

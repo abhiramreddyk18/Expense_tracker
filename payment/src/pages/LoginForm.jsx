@@ -1,70 +1,52 @@
-
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import { login,isLoggedIn} from '../auth'
-function LoginForm() {
+import { login, isLoggedIn } from '../auth';
 
+function LoginForm() {
   const navigate = useNavigate();
 
   const [email, setemail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const backendUrl = 'http://localhost:3000';
- const [loading, setLoading] = useState(false);
-useEffect(() => {
-  if (isLoggedIn()) {
-    navigate('/home', { replace: true });
-  }
-  
-}, []);
 
-
-  const handleEmailChange = (e) => {
-    setemail(e.target.value);
-  };
-
-  const handleOtpChange = (e) => {
-    setOtp(e.target.value);
-  };
+  useEffect(() => {
+    if (isLoggedIn()) {
+      navigate('/home', { replace: true });
+    }
+  }, []);
 
   const sendOtp = async () => {
-     setLoading(true); // ✅ show loading
+    setLoading(true);
     setError('');
     try {
       const response = await fetch(`${backendUrl}/auth/sendotp`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },  
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
-      console.log(data);
-
       if (data.success) {
-        console.log(data.message);
         setOtpSent(true);
-
       } else {
         setError('Failed to send OTP.');
       }
     } catch (error) {
-      setError('Error sending OTP.',error);
+      setError('Error sending OTP.');
     }
     setLoading(false);
   };
 
   const verifyOtp = async () => {
-     setLoading(true); // ✅ show loading
+    setLoading(true);
     setError('');
     try {
       const response = await fetch(`${backendUrl}/auth/verify-otp`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),
       });
 
@@ -74,113 +56,67 @@ useEffect(() => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('userEmail', email);
-        if(data.isNewUser)
-          {
-            navigate('/bankfrom');
-          }
-        else 
-        {
-          navigate('/home');
-        }
-
+        navigate(data.isNewUser ? '/bankfrom' : '/home');
       } else {
         setError('Invalid OTP.');
       }
     } catch (error) {
-      setError('Error verifying OTP.',error);
+      setError('Error verifying OTP.');
     }
     setLoading(false);
   };
 
-  return (
-<div
-  style={{
-    maxWidth: '400px',
-    margin: '80px auto',
-    padding: '40px',
-    border: '1px solid #ccc',
-    borderRadius: '16px',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
-    fontFamily: 'Segoe UI, sans-serif',
-    backgroundColor: '#ffffff',
-  }}
->
-  <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
-    Login
-  </h1>
+ return (
+  <div
+    className="h-screen w-screen bg-cover bg-center bg-no-repeat flex items-center justify-center overflow-hidden"
+    style={{ backgroundImage: "url('/images/loginpage.jpg')" }}
+  >
+    <div className="w-full max-w-sm bg-white bg-opacity-90 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h1>
 
-  {loading ? (
-        <p style={{ textAlign: 'center', color: '#555' }}>Processing...</p> // ✅ loading message
-      ) :!otpSent ? (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <input
-        type="email"
-        placeholder="Enter Email"
-        value={email}
-        onChange={handleEmailChange}
-        style={{
-          padding: '12px',
-          fontSize: '16px',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          outlineColor: '#007bff',
-        }}
-      />
-      <button
-        onClick={sendOtp}
-        style={{
-          padding: '12px',
-          backgroundColor: '#007bff',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontSize: '16px',
-        }}
-      >
-        Send OTP
-      </button>
+      {loading ? (
+        <p className="text-center text-gray-600">Processing...</p>
+      ) : !otpSent ? (
+        <div className="flex flex-col gap-4">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setemail(e.target.value)}
+            placeholder="Enter Email"
+            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={sendOtp}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
+          >
+            Send OTP
+          </button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          <input
+            type="text"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            placeholder="Enter OTP"
+            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <button
+            onClick={verifyOtp}
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-md transition"
+          >
+            Verify OTP
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <p className="text-red-600 text-center mt-4">{error}</p>
+      )}
     </div>
-  ) : (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <input
-        type="text"
-        placeholder="Enter OTP"
-        value={otp}
-        onChange={handleOtpChange}
-        style={{
-          padding: '12px',
-          fontSize: '16px',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          outlineColor: '#28a745',
-        }}
-      />
-      <button
-        onClick={verifyOtp}
-        style={{
-          padding: '12px',
-          backgroundColor: '#28a745',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontSize: '16px',
-        }}
-      >
-        Verify OTP
-      </button>
-    </div>
-  )}
+  </div>
+);
 
-  {error && (
-    <p style={{ color: 'red', marginTop: '20px', textAlign: 'center' }}>
-      {error}
-    </p>
-  )}
-</div>
-
-  );
 }
 
 export default LoginForm;
