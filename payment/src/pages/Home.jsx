@@ -6,11 +6,12 @@ import { BsGraphUp } from "react-icons/bs";
 import { BiSolidCategory } from "react-icons/bi";
 import { GrTransaction } from "react-icons/gr";
 import { CgProfile } from "react-icons/cg";
+import { useTheme } from '../context/ThemeContext'; // Adjust the import path based on your folder structure
 
 const Home = () => {
   const [balance, setBalance] = useState(0);
-  const [darkMode, setDarkMode] = useState(false);  // <-- dark mode state
   const backendUrl = 'http://localhost:3000';
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
@@ -28,10 +29,7 @@ const Home = () => {
     fetchUserDetails();
   }, []);
 
-  // Toggle handler
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-
-  // Base classes for bg and text depending on theme
+  // Theme classes based on context
   const bgClass = darkMode ? "bg-gray-900" : "bg-indigo-100";
   const textPrimaryClass = darkMode ? "text-indigo-200" : "text-indigo-900";
   const textSecondaryClass = darkMode ? "text-indigo-400" : "text-indigo-600";
@@ -41,17 +39,6 @@ const Home = () => {
 
   return (
     <div className={`min-h-screen ${bgClass} transition-colors duration-500`}>
-      {/* Dark Mode Toggle Button */}
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-end">
-        <button
-          onClick={toggleDarkMode}
-          className={`px-4 py-2 rounded-md font-semibold focus:outline-none
-            ${darkMode ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-indigo-200 text-indigo-900 hover:bg-indigo-300'}`}
-        >
-          {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        </button>
-      </div>
-
       {/* Hero Section */}
       <section className={`flex flex-col lg:flex-row py-5 rounded-lg overflow-hidden mb-8 max-w-7xl mx-auto`}>
         {/* Left Side: Balance & Button */}
