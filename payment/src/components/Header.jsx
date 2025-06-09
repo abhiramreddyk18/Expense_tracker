@@ -3,19 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { FaUserCircle, FaBars } from 'react-icons/fa';
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { isLoggedIn } from '../auth';
-import { useTheme } from '../context/ThemeContext'; // 👈 import context
+import { useTheme } from '../context/ThemeContext';
 
 const Header = () => {
   const navigate = useNavigate();
   const userName = localStorage.getItem('name') || 'User';
-  const { darkMode, toggleDarkMode } = useTheme(); // 👈 use context
+  const { darkMode, toggleDarkMode } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -29,13 +27,11 @@ const Header = () => {
   const closeDropdown = () => setShowDropdown(false);
 
   return (
-    <header className={`sticky top-0 z-10 px-6 py-4 shadow-md flex justify-between items-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-blue-600 text-white'}`}>
+    <header className={`sticky top-0 z-10 px-6 py-4 shadow-md flex justify-between items-center ${darkMode ? 'bg-gray-800 text-white' : 'bg-blue-600 text-white'}`}>
       <div className="flex items-center gap-6">
         <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
           <FaMoneyBillTrendUp className="mr-2 text-2xl" />
-          <span className="text-lg font-bold">
-            PayOLog <sub className="text-xs">E T S</sub>
-          </span>
+          <span className="text-lg font-bold">PayOLog <sub className="text-xs">E T S</sub></span>
         </div>
 
         {!isMobile && isLoggedIn() && (

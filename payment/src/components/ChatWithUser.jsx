@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -19,38 +19,50 @@ const ChatWithUser = () => {
   const navigate = useNavigate();
   const receiver = location.state?.receiver;
   const receiverId = receiver?._id;
-console.log(receiver);
-  const fetchMessages = async () => {
-    if (!receiverId) return;
-    try {
-      const res = await axios.get(`${backendUrl}/chat/${senderId}/${receiverId}`);
-      setMessages(res.data);
-    } catch (err) {
-      console.error('Error fetching messages:', err);
-    }
-  };
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    const fetchMessages = async () => {
+      if (!receiverId) return;
+      const res = await axios.get(`${backendUrl}/chat/${senderId}/${receiverId}`);
+      setMessages(res.data);
+    };
     fetchMessages();
   }, [refresh, receiverId]);
 
+  useEffect(() => scrollToBottom(), [messages]);
+
   useEffect(() => {
     if (!senderId || !receiverId) return;
-
     socket.emit('joinRoom', senderId);
     socket.emit('joinRoom', receiverId);
-
-    socket.on('messageReceived', (newMessage) => {
+    socket.on('messageReceived', (newMsg) => {
       if (
-        (newMessage.senderId === senderId && newMessage.receiverId === receiverId) ||
-        (newMessage.senderId === receiverId && newMessage.receiverId === senderId)
+        (newMsg.senderId === senderId && newMsg.receiverId === receiverId) ||
+        (newMsg.senderId === receiverId && newMsg.receiverId === senderId)
       ) {
-        setMessages((prev) => [...prev, newMessage]);
+        setMessages((prev) => [...prev, newMsg]);
       }
     });
-
     return () => socket.off('messageReceived');
   }, [senderId, receiverId]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+  };
+
+  const sendTextMessage = async () => {
+    if (!input.trim()) return;
+    const res = await axios.post(`${backendUrl}/chat/send`, {
+      senderId,
+      receiverId,
+      message: input.trim(),
+      type: 'text',
+    });
+    socket.emit('sendMessage', res.data);
+    setInput('');
+    setRefresh(!refresh);
+  };
 
   const sendMoneyWithDetails = async () => {
     try {
@@ -62,15 +74,12 @@ console.log(receiver);
         description,
         type: 'money',
       });
-      const sentMessage = res.data;
-      socket.emit('sendMessage', sentMessage);
-
+      socket.emit('sendMessage', res.data);
       setInput('');
       setCategory('');
       setDescription('');
       setShowPaymentPopup(false);
       setRefresh(!refresh);
-
       navigate('/confirm-pin', {
         state: {
           receiver,
@@ -88,84 +97,57 @@ console.log(receiver);
     }
   };
 
-  const sendTextMessage = async () => {
-    if (!input.trim()) return;
-    try {
-      const res = await axios.post(`${backendUrl}/chat/send`, {
-        senderId,
-        receiverId,
-        message: input.trim(),
-        type: 'text',
-      });
-      const sentMessage = res.data;
-      socket.emit('sendMessage', sentMessage);
-
-      setInput('');
-      setRefresh(!refresh);
-    } catch (err) {
-      console.error('Error sending message:', err);
-    }
-  };
-
   return (
-    <div className="w-screen h-screen m-0 p-0 bg-white px-4 mt-6 shadow-lg rounded-lg flex flex-col min-h-screen">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-4">
+    <div className="w-full h-screen bg-white flex flex-col">
+      <div className="fixed top-18 left-0 right-0 bg-white z-20 shadow px-4 py-3 flex items-center gap-4">
         <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-bold">
           {receiver?.name?.charAt(0) || 'U'}
         </div>
         <h2 className="text-xl font-semibold">{receiver?.name || 'User'}</h2>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-3 bg-gray-100 p-4 rounded-md max-h-[70vh]">
-       {messages.map((msg, index) => {
-  const time = new Date(msg.timestamp).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false, // Use true if you want AM/PM format
-  });
-
-  return (
-    <div
-      key={index}
-      className={`w-full flex ${msg.senderId === senderId ? 'justify-end' : 'justify-start'} mb-2`}
-    >
       <div
-        className={`inline-block px-4 py-4 pb-6 rounded-lg text-sm break-words max-w-[80%] relative ${
-          msg.type === 'money'
-            ? 'bg-yellow-100 border border-yellow-400 text-gray-800'
-            : msg.senderId === senderId
-            ? 'bg-blue-200 text-right'
-            : 'bg-gray-300 text-left'
-        }`}
+        className="mt-[1px] flex-1 overflow-y-auto px-4 space-y-3 bg-gray-100"
+        style={{ paddingBottom: '72px' }}
       >
-        {/* Message Content */}
-        {msg.type === 'money' ? (
-          <div>
-            <div className="font-semibold text-green-800">💸 ${msg.amount}</div>
-            <div className="text-xs text-gray-700">Category: {msg.category}</div>
-            {msg.description && (
-              <div className="text-xs text-gray-600 italic">"{msg.description}"</div>
-            )}
-          </div>
-        ) : (
-          <span>{msg.message}</span>
-        )}
-
-        {/* Timestamp */}
-        <div className="text-[10px] text-gray-600 absolute bottom-1 right-2">
-          {time}
-        </div>
+        {messages.map((msg, i) => {
+          const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return (
+            <div
+              key={i}
+              className={`w-full flex ${
+                msg.senderId === senderId ? 'justify-end' : 'justify-start'
+              } mb-2`}
+            >
+              <div
+                className={`inline-block px-4 py-4 pb-6 rounded-lg text-sm break-words max-w-[80%] relative ${
+                  msg.type === 'money'
+                    ? 'bg-yellow-100 border border-yellow-400 text-gray-800'
+                    : msg.senderId === senderId
+                    ? 'bg-blue-200 text-right'
+                    : 'bg-gray-300 text-left'
+                }`}
+              >
+                {msg.type === 'money' ? (
+                  <div>
+                    <div className="font-semibold text-green-800">💸 ${msg.amount}</div>
+                    <div className="text-xs text-gray-700">Category: {msg.category}</div>
+                    {msg.description && (
+                      <div className="text-xs text-gray-600 italic">"{msg.description}"</div>
+                    )}
+                  </div>
+                ) : (
+                  <span>{msg.message}</span>
+                )}
+                <div className="text-[10px] text-gray-600 absolute bottom-1 right-2">{time}</div>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={messagesEndRef}></div>
       </div>
-    </div>
-  );
-})}
 
-      </div>
-
-      {/* Input Section */}
-      <div className="sticky bottom-0 bg-white pt-4 pb-8">
+      <div className="sticky bottom-0 bg-white px-4 py-3 border-t border-gray-200 z-10">
         <div className="flex gap-3">
           <input
             type="text"
@@ -192,50 +174,34 @@ console.log(receiver);
 
       {/* Payment Popup Modal */}
       {showPaymentPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Payment Details</h3>
-            <div className="mb-3">
-              <label className="block text-sm mb-1">Category</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              >
-                <option value="">Select Category</option>
-                <option value="Food">Food</option>
-                <option value="Bills">Bills</option>
-                <option value="Shopping">Shopping</option>
-                <option value="Travel">Travel</option>
-                <option value="Education">Education</option>
-                <option value="Health">Health</option>
-                <option value="Salary">Salary</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm mb-1">Description</label>
-              <input
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Optional"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              />
-            </div>
-            <div className="flex justify-between">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-sm">
+            <h3 className="text-lg font-semibold mb-4">Enter Payment Details</h3>
+            <input
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Category"
+              className="w-full border border-gray-300 rounded px-3 py-2 mb-3 text-sm"
+            />
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Description (optional)"
+              className="w-full border border-gray-300 rounded px-3 py-2 mb-3 text-sm"
+              rows={3}
+            />
+            <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowPaymentPopup(false)}
-                className="text-gray-600 border border-gray-400 px-4 py-2 rounded-md"
+                className="px-4 py-2 rounded bg-gray-200 text-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={sendMoneyWithDetails}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
-                disabled={!category}
+                className="px-4 py-2 rounded bg-green-600 text-white text-sm"
               >
-                Confirm Payment
+                Send
               </button>
             </div>
           </div>
