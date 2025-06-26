@@ -4,13 +4,15 @@ import { FaUserCircle, FaBars } from 'react-icons/fa';
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { isLoggedIn } from '../auth';
 import { useTheme } from '../context/ThemeContext';
+import axios from 'axios';
 
 const Header = () => {
   const navigate = useNavigate();
-  const userName = localStorage.getItem('name') || 'User';
+  const email = localStorage.getItem('userEmail');
   const { darkMode, toggleDarkMode } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [userName, setUserName] = useState('User');
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -22,6 +24,20 @@ const Header = () => {
     document.body.classList.toggle('dark', darkMode);
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
+
+  // 🔍 Fetch user name using email
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (!email) return;
+      try {
+        const res = await axios.get(`http://localhost:3000/user/user-by-email/${email}`);
+        setUserName(res.data.name);
+      } catch (err) {
+        console.error('Error fetching username:', err);
+      }
+    };
+    fetchUserName();
+  }, [email]);
 
   const toggleDropdown = () => setShowDropdown(!showDropdown);
   const closeDropdown = () => setShowDropdown(false);
