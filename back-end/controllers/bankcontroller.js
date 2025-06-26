@@ -24,11 +24,11 @@ exports.check_user = async (req, res) => {
 };
 
 exports.verify_bank_details = async (req, res) => {
-  const { email, phoneNumber, accountNumber, bankName, ifscCode,CVV} = req.body;
+  const {email,phoneNumber, accountNumber, bankName, ifscCode,CVV} = req.body;
 
   try {
    
-    const fakeBank = await BankDetails.findOne({ email });
+    const fakeBank = await BankDetails.findOne({ phonenumber: phoneNumber });
 
     if (!fakeBank) {
       return res.status(400).json({ success: false, message: 'Bank details not found' });
@@ -61,7 +61,6 @@ exports.verify_bank_details = async (req, res) => {
       ifsc: fakeBank.ifsc,
       cvv: fakeBank.cvv,
       balance: fakeBank.balance,
-      email: fakeBank.email,
       phoneNumber: fakeBank.phonenumber,
       pin:null
     });

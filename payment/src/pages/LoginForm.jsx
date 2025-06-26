@@ -22,6 +22,8 @@ function LoginForm() {
     setLoading(true);
     setError('');
     try {
+
+       localStorage.setItem('userEmail', email);
       const response = await fetch(`${backendUrl}/auth/sendotp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

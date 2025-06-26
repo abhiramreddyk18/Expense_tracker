@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const Header = () => {
   const navigate = useNavigate();
-  const email = localStorage.getItem('userEmail');
+  const id = localStorage.getItem('userId');
   const { darkMode, toggleDarkMode } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -28,9 +28,9 @@ const backendUrl = 'http://localhost:3000';
   // 🔍 Fetch user name using email
   useEffect(() => {
     const fetchUserName = async () => {
-      if (!email) return;
+      if (!id) return;
       try {
-        const res = await axios.get(`${backendUrl}/user/user-by-email/${email}`);
+        const res = await axios.get(`${backendUrl}/user/user-by-id/${id}`);
         console.log("username: ", res)
         setUserName(res.data.name);
       } catch (err) {
@@ -38,7 +38,7 @@ const backendUrl = 'http://localhost:3000';
       }
     };
     fetchUserName();
-  }, [email]);
+  }, [id]);
 
   const toggleDropdown = () => setShowDropdown(!showDropdown);
   const closeDropdown = () => setShowDropdown(false);

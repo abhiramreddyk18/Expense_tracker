@@ -31,10 +31,6 @@ const bankSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  email: {
-    type: String,
-    required: true
-  },
   phonenumber: {
     type: String,
     required: true

@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 const UserDetailsForm = () => {
   const [formData, setFormData] = useState({
-    email: '',
+
+    email:localStorage.getItem('userEmail'),
     phoneNumber: '',
     accountNumber: '',
     bankName: '',
@@ -42,18 +43,7 @@ const UserDetailsForm = () => {
       <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Enter Your Bank Details</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-400"
-          />
-        </div>
-
+       
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
           <input

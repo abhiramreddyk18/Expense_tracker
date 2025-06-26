@@ -64,7 +64,12 @@ if (!userId || userId === 'null' || !mongoose.Types.ObjectId.isValid(userId)) {
 
   exports.finding_name=async (req, res) => {
   try {
-    const user = await UserBank.findOne({ email: req.params.email });
+
+
+    const userid=await User.findById(req.params.id)
+
+    const user = await UserBank.findById(userid.bankdetails);
+    
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json({ name: user.name });
   } catch (err) {

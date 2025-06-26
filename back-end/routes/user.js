@@ -5,6 +5,6 @@ const { search_user_by_phone, search_user_by_id, finding_name } = require('../co
 
 router.get('/searchuser', search_user_by_phone);
 router.get('/:id',search_user_by_id);
-router.get('/user-by-email/:email',finding_name)
+router.get('/user-by-id/:id',finding_name)
 
 module.exports = router;
