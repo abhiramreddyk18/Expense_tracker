@@ -31,13 +31,16 @@ exports.send_message = async (req, res) => {
   }
 };
 
+const mongoose = require('mongoose');
+
 exports.users_messages = async (req, res) => {
   const { user1Id, user2Id } = req.params;
+
   try {
     const chats = await Message.find({
       $or: [
-        { senderId: user1Id, receiverId: user2Id },
-        { senderId: user2Id, receiverId: user1Id }
+        { senderId: new mongoose.Types.ObjectId(user1Id), receiverId: new mongoose.Types.ObjectId(user2Id) },
+        { senderId: new mongoose.Types.ObjectId(user2Id), receiverId: new mongoose.Types.ObjectId(user1Id) }
       ]
     }).sort({ timestamp: 1 });
 
@@ -46,3 +49,4 @@ exports.users_messages = async (req, res) => {
     res.status(500).json({ message: 'Error fetching chat', error: err.message });
   }
 };
+  
