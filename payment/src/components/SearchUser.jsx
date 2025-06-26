@@ -95,7 +95,6 @@ const SearchUser = () => {
             {payments.map((payment) => (
               <div
                 key={payment._id}
-                onClick={() => goToChat(payment)}
                 onMouseEnter={() => setHoveredCard(payment._id)}
                 onMouseLeave={() => setHoveredCard(null)}
                 className={`flex justify-between items-center p-4 my-2 rounded-lg cursor-pointer transform transition duration-200 ${

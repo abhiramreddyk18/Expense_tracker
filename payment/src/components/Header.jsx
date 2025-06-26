@@ -12,8 +12,8 @@ const Header = () => {
   const { darkMode, toggleDarkMode } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [userName, setUserName] = useState('User');
-
+  const [userName, setUserName] = useState('User'); 
+const backendUrl = 'http://localhost:3000';
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
@@ -30,7 +30,8 @@ const Header = () => {
     const fetchUserName = async () => {
       if (!email) return;
       try {
-        const res = await axios.get(`http://localhost:3000/user/user-by-email/${email}`);
+        const res = await axios.get(`${backendUrl}/user/user-by-email/${email}`);
+        console.log("username: ", res)
         setUserName(res.data.name);
       } catch (err) {
         console.error('Error fetching username:', err);
