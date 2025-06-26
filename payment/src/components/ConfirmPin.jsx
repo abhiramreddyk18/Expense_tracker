@@ -11,194 +11,129 @@ const ConfirmPin = () => {
   const [senderbankid, setsenderbankid] = useState(null);
   const navigate = useNavigate();
   const backendUrl = 'http://localhost:3000';
-  
-
-  useEffect(() => {
-    console.log("Navigation state received:", state);
-  }, []);
 
   useEffect(() => {
     const checkPinSet = async () => {
       try {
         const res = await axios.get(`${backendUrl}/user/${state?.senderId}`);
         const userbank = res.data;
-
         setsenderbankid(userbank._id);
 
         if (!userbank.pin) {
           toast.info("You need to set your PIN before making transactions.");
           setTimeout(() => {
-            navigate("/setpin", {
-              state: { senderId: state?.senderId },
-            });
-          }, 2000); 
+            navigate("/setpin", { state: { senderId: state?.senderId } });
+          }, 2000);
         } else {
           setLoading(false);
         }
       } catch (err) {
         toast.error("Unable to verify PIN setup. Please try again.");
         setTimeout(() => {
-          navigate("/send-money");
+          navigate("/searchuser");
         }, 2000);
       }
     };
 
-    if (state?.senderId) {
+    if (state?.senderId && state?.receiver) {
       checkPinSet();
     } else {
       toast.error("Invalid access");
       setTimeout(() => {
-        navigate("/send-money");
+        navigate("/searchuser");
       }, 2000);
     }
-  }, [state?.senderId, navigate]);
+  }, [state?.senderId, state?.receiver, navigate]);
 
   const handleConfirm = async () => {
-  const toastId = toast.loading("Processing your transaction...");
+    const toastId = toast.loading("Processing your transaction...");
 
-  try {
-
-
-    await axios.post(`${backendUrl}/payment/send_money`, {
-      senderId: senderbankid,
-      receiverId: state?.receiverId,
-      amount: Number(state?.amount),
-      category: state?.category,
-      description: state?.description,
-      pin
-    });
-
-    toast.update(toastId, {
-      render: "Money sent successfully",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
-
-    setTimeout(() => {
-      if (state?.returnToChat) {
-        navigate("/chat", {
-          state: { receiver: state.receiver }
-        });
-      } else {
-        navigate("/searchuser");
-      }
-    }, 2000);
-
-  } catch (err) {
-    console.error(err);
-
-    const errorMsg = err.response?.data?.message || "Transaction failed";
-
-    toast.update(toastId, {
-      render: errorMsg,
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
-
-    
     try {
-      await axios.post(`${backendUrl}/chat/send`, {
-        senderId: state?.senderId,
-        receiverId: state?.receiverId,
-        message: `❌ Transaction failed: ${errorMsg}`,
-        type: "text",
+      await axios.post(`${backendUrl}/payment/send_money`, {
+        senderId: senderbankid,
+        receiverId: state.receiver._id,
+        amount: Number(state.amount),
+        category: state.category,
+        description: state.description,
+        pin
       });
-    } catch (chatErr) {
-      console.error("Failed to send error message to chat:", chatErr);
-    }
 
-    setTimeout(() => {
-     console.log("receiver: ", state.receiver);
-      if (state?.returnToChat) {
-        navigate("/chat", {
-          state: { receiver: state.receiver }
+      toast.update(toastId, {
+        render: "Money sent successfully",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      setTimeout(() => {
+        if (state?.returnToChat) {
+          navigate("/chat", {
+            state: { receiver: state.receiver }
+          });
+        } else {
+          navigate("/searchuser");
+        }
+      }, 2000);
+
+    } catch (err) {
+      console.error(err);
+      const errorMsg = err.response?.data?.message || "Transaction failed";
+
+      toast.update(toastId, {
+        render: errorMsg,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      try {
+        await axios.post(`${backendUrl}/chat/send`, {
+          senderId: state?.senderId,
+          receiverId: state.receiver._id,
+          message: `❌ Transaction failed: ${errorMsg}`,
+          type: "text",
         });
-      } else {
-        navigate("/searchuser");
+      } catch (chatErr) {
+        console.error("Failed to send error message to chat:", chatErr);
       }
-    }, 2000);
-  }
-};
 
-  if (loading) return <div style={styles.loading}>Loading...</div>;
+      setTimeout(() => {
+        if (state?.returnToChat) {
+          navigate("/chat", {
+            state: { receiver: state.receiver }
+          });
+        } else {
+          navigate("/searchuser");
+        }
+      }, 2000);
+    }
+  };
+
+  if (loading) return <div style={{ textAlign: 'center', marginTop: '100px' }}>Loading...</div>;
 
   return (
-    <div style={styles.container}>
-      <h3 style={styles.title}>Confirm Transaction</h3>
-      <p style={styles.subTitle}>Enter your 4-digit PIN</p>
-      <input
-        type="password"
-        value={pin}
-        maxLength="4"
-        placeholder="••••"
-        autoComplete="new-password"
-        style={styles.pinInput}
-        onChange={(e) => setPin(e.target.value)}
-      />
-      <button
-        style={styles.confirmButton}
-        onClick={handleConfirm}
-        onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
-        onMouseOut={(e) => e.target.style.backgroundColor = '#007bff'}
-      >
-        Confirm & Send
-      </button>
-      <ToastContainer position="top-center" autoClose={3000} hideProgressBar />
+    <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f3f4f6' }}>
+      <div style={{ background: '#fff', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
+        <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>Confirm Transaction</h2>
+        <p style={{ fontSize: '16px', marginBottom: '20px' }}>Enter your 4-digit PIN</p>
+        <input
+          type="password"
+          value={pin}
+          maxLength="4"
+          placeholder="••••"
+          style={{ fontSize: '20px', textAlign: 'center', width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', border: '1px solid #ccc', letterSpacing: '8px' }}
+          onChange={(e) => setPin(e.target.value)}
+        />
+        <button
+          onClick={handleConfirm}
+          style={{ width: '100%', padding: '12px', fontSize: '16px', color: '#fff', backgroundColor: '#007bff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+        >
+          Confirm & Send
+        </button>
+        <ToastContainer position="top-center" autoClose={3000} hideProgressBar />
+      </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '400px',
-    margin: '60px auto',
-    padding: '30px',
-    borderRadius: '12px',
-    backgroundColor: '#ffffff',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-    textAlign: 'center',
-    fontFamily: 'Arial, sans-serif',
-  },
-  title: {
-    fontSize: '24px',
-    marginBottom: '10px',
-    color: '#333',
-  },
-  subTitle: {
-    fontSize: '16px',
-    marginBottom: '25px',
-    color: '#666',
-  },
-  pinInput: {
-    fontSize: '20px',
-    textAlign: 'center',
-    width: '100%',
-    padding: '12px',
-    marginBottom: '20px',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-    letterSpacing: '8px',
-    outline: 'none',
-  },
-  confirmButton: {
-    width: '100%',
-    padding: '12px',
-    fontSize: '16px',
-    color: '#fff',
-    backgroundColor: '#007bff',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-  },
-  loading: {
-    fontSize: '18px',
-    textAlign: 'center',
-    marginTop: '100px',
-    color: '#333',
-  }
 };
 
 export default ConfirmPin;
