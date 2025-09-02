@@ -24,7 +24,7 @@ function LoginForm() {
     try {
 
        localStorage.setItem('userEmail', email);
-      const response = await fetch(`${backendUrl}/auth/sendotp`, {
+      const response = await fetch("https://expense-tracker-00kf.onrender.com//auth/sendotp", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
