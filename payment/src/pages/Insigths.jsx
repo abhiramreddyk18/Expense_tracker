@@ -28,21 +28,11 @@ const Insights = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`${backendUrl}/bank/category-summary/${userId}?days=${days}`);
-        const incomeData = [], expenseData = [];
-
-        res.data.forEach(item => {
-          if (item.type === 'Income') {
-            incomeData.push({ category: `${item.category} (income)`, totalAmount: item.totalAmount });
-          } else {
-            expenseData.push({ category: `${item.category} (expense)`, totalAmount: item.totalAmount });
-          }
-        });
-
-        setCategoryData([...incomeData, ...expenseData]);
+        setCategoryData(res.data);
 
         const limitsRes = await axios.get(`${backendUrl}/bank/category-limits/${userId}`);
         const mergedData = limitsRes.data.map(limitItem => {
-          const matched = res.data.find(s => s.category === limitItem.category && s.type === 'expense');
+          const matched = res.data.find(s => s.category === limitItem.category);
           return {
             category: limitItem.category,
             limit: limitItem.limitAmount,
@@ -102,7 +92,7 @@ const Insights = () => {
         <div className="w-full lg:w-1/2 p-6 rounded-xl shadow-lg bg-neutral-800">
           <h3 className="text-2xl font-semibold mb-4 text-white flex items-center gap-2">
             <PiGraphFill className="text-2xl" />
-            Category-wise Income & Expenses
+            Category-wise Spending
           </h3>
           <div className="flex justify-center">
             <PieChart width={500} height={400}>

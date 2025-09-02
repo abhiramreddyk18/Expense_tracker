@@ -140,7 +140,6 @@ exports.getSummaryForLastNDays = async (req, res) => {
   }
 };
 
-
 exports.getcategorySum = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -168,7 +167,6 @@ exports.getcategorySum = async (req, res) => {
       return res.status(404).json({ error: 'User bank not found' });
     }
 
-   
     const summary = await Transaction.aggregate([
       {
         $match: {
@@ -178,22 +176,23 @@ exports.getcategorySum = async (req, res) => {
       },
       {
         $group: {
-          _id: "$category",   
+          _id: "$category",
           totalAmount: { $sum: "$amount" },
         },
       },
       {
-        $sort: { "_id": 1 }, 
+        $project: {
+          _id: 0,
+          category: "$_id",
+          totalAmount: 1,
+        },
+      },
+      {
+        $sort: { category: 1 },
       },
     ]);
 
-  
-    const formattedSummary = summary.map(item => ({
-      category: item._id,
-      totalAmount: item.totalAmount,
-    }));
-
-    return res.json(formattedSummary);
+    return res.json(summary);
   } catch (err) {
     console.error('Error fetching category sum:', err);
     return res.status(500).json({ error: "Failed to fetch category summary." });
