@@ -34,10 +34,14 @@ app.use('/bank', bankUserRoutes);
 app.use('/user', userRoutes);
 app.use('/chat', chatRoutes);
 
+app.get('/', (req, res) => {
+  res.send('✅ Expense Tracker Backend is running!');
+});
+
 // Socket.IO Setup
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -56,6 +60,8 @@ io.on('connection', (socket) => {
     console.log('Client disconnected:', socket.id);
   });
 });
+
+
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
