@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const LimitManager = ({ limitsData, setLimitsData, userId, backendUrl, availableCategories }) => {
+const LimitManager = ({ limitsData, setLimitsData, userId, availableCategories }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [limitAmount, setLimitAmount] = useState('');
-
+  const backendUrl=process.env.REACT_APP_BACKEND_URL
   const handleDeleteLimit = async (categoryToDelete) => {
     const confirmDelete = window.confirm(`Are you sure you want to delete the limit for "${categoryToDelete}"?`);
     if (!confirmDelete) return;

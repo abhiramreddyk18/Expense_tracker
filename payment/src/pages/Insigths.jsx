@@ -19,7 +19,7 @@ const Insights = () => {
   const [days, setDays] = useState(30);
 
   const userId = localStorage.getItem('userId');
-  const backendUrl = 'http://localhost:3000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL
   const categories = ['Food', 'Bills', 'Shopping', 'Travel', 'Education', 'Health', 'Salary', 'Other'];
 
   useEffect(() => {
@@ -144,7 +144,7 @@ const Insights = () => {
           limitsData={limitsData}
           setLimitsData={setLimitsData}
           userId={userId}
-          backendUrl={backendUrl}
+         
           availableCategories={categories}
         />
       </div>

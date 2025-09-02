@@ -19,7 +19,7 @@ const TransactionHistory = () => {
 
   const { darkMode } = useTheme();
   const userId = localStorage.getItem("userId");
-  const backendUrl = 'http://localhost:3000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL
 
   const fetchHistory = async () => {
     try {

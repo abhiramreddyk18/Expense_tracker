@@ -10,7 +10,7 @@ const ConfirmPin = () => {
   const [loading, setLoading] = useState(true);
   const [senderbankid, setsenderbankid] = useState(null);
   const navigate = useNavigate();
-  const backendUrl = 'http://localhost:3000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL
 
   useEffect(() => {
     const checkPinSet = async () => {

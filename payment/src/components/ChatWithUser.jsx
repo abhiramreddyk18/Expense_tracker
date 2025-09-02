@@ -3,8 +3,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import socket from '../socket';
 
-const backendUrl = 'http://localhost:3000';
-
+const backendUrl =process.env.REACT_APP_BACKEND_URL
 const ChatWithUser = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');

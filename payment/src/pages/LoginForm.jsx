@@ -10,7 +10,7 @@ function LoginForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const backendUrl = 'http://localhost:3000';
+  const backendUrl =process.env.REACT_APP_BACKEND_URL
 
   useEffect(() => {
     if (isLoggedIn()) {

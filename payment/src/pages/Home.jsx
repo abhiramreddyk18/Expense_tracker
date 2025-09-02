@@ -10,7 +10,7 @@ import { useTheme } from '../context/ThemeContext'; // Adjust the import path ba
 
 const Home = () => {
   const [balance, setBalance] = useState(0);
-  const backendUrl = 'http://localhost:3000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL
   const { darkMode } = useTheme();
 
   useEffect(() => {

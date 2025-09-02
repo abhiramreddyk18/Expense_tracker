@@ -13,7 +13,7 @@ const UserDetailsForm = () => {
   });
 
   const navigate = useNavigate();
-  const backendUrl = 'http://localhost:3000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

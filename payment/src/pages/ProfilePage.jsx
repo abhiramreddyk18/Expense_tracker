@@ -12,7 +12,7 @@ const ProfilePage = () => {
   const [Savings, setSavings] = useState(null);
 
   const navigate = useNavigate();
-  const backendUrl = 'http://localhost:3000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL
   const userId = localStorage.getItem('userId');
 
   const handleLogout = () => {
