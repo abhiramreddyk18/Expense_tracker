@@ -10,7 +10,7 @@ function LoginForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const backendUrl =process.env.REACT_APP_BACKEND_URL;
+  const backendUrl =import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     if (isLoggedIn()) {

@@ -19,7 +19,7 @@ const Insights = () => {
   const [days, setDays] = useState(30);
 
   const userId = localStorage.getItem('userId');
-  const backendUrl = process.env.REACT_APP_BACKEND_URL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
   const categories = ['Food', 'Bills', 'Shopping', 'Travel', 'Education', 'Health', 'Salary', 'Other'];
 
   useEffect(() => {

@@ -10,7 +10,7 @@ const ConfirmPin = () => {
   const [loading, setLoading] = useState(true);
   const [senderbankid, setsenderbankid] = useState(null);
   const navigate = useNavigate();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
 
   useEffect(() => {
     const checkPinSet = async () => {
