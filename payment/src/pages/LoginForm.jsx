@@ -10,7 +10,7 @@ function LoginForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const backendUrl =process.env.REACT_APP_BACKEND_URL
+  const backendUrl =process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -24,7 +24,7 @@ function LoginForm() {
     try {
 
        localStorage.setItem('userEmail', email);
-      const response = await fetch("https://expense-tracker-00kf.onrender.com//auth/sendotp", {
+      const response = await fetch(`${backendUrl}/auth/sendotp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
