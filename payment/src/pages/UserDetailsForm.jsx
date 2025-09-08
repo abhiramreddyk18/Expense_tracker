@@ -13,7 +13,7 @@ const UserDetailsForm = () => {
   });
 
   const navigate = useNavigate();
-  const backendUrl = process.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

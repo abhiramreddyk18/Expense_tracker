@@ -19,7 +19,7 @@ const TransactionHistory = () => {
 
   const { darkMode } = useTheme();
   const userId = localStorage.getItem("userId");
-  const backendUrl = process.env.VITE_BACKEND_URL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
 
   const fetchHistory = async () => {
     try {
